@@ -29,6 +29,7 @@ namespace goc_api.Controllers
         public IEnumerable<string> PingDb()
         {
             using var conn = new SqlConnection(this.myConnectionString);
+            conn.Open();
             using var command = conn.CreateCommand();
             command.CommandText = "SELECT name FROM sys.tables";
             using var reader = command.ExecuteReader();
