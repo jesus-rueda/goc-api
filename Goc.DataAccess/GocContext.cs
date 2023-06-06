@@ -190,6 +190,10 @@ public partial class GocContext : DbContext
 
             entity.Property(e => e.EndDate).HasColumnType("smalldatetime");
 
+            entity.Property(e => e.Story)
+                .IsRequired()
+                .HasMaxLength(500);
+
             entity.Property(e => e.Instructions)
                 .IsRequired()
                 .HasMaxLength(500);
