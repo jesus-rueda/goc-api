@@ -1,5 +1,5 @@
-using Goc.Api.Hubs;
 using Goc.Business;
+using Goc.Business.Hubs;
 using Goc.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;

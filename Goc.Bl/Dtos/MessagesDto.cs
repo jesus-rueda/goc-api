@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Goc.Api.Dtos;
+namespace Goc.Business.Dtos;
 
 public partial class MessagesDto
 {

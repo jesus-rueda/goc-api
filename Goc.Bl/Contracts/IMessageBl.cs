@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Goc.Api.Dtos;
+using Goc.Business.Dtos;
 
 namespace Goc.Business.Contracts
 {

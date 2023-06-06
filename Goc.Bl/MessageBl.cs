@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Goc.Api.Dtos;
 using Goc.Business.Contracts;
+using Goc.Business.Dtos;
 using Goc.Business.Extensions;
 using Goc.Models;
 using Microsoft.EntityFrameworkCore;
