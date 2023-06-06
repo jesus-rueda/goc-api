@@ -1,0 +1,81 @@
+﻿{
+   "CodeGenerationMode": 2,
+   "ContextClassName": "GOCContext",
+   "ContextNamespace": null,
+   "DefaultDacpacSchema": null,
+   "FilterSchemas": false,
+   "IncludeConnectionString": false,
+   "ModelNamespace": null,
+   "OutputContextPath": null,
+   "OutputPath": "Models",
+   "PreserveCasingWithRegex": true,
+   "ProjectRootNamespace": "Goc",
+   "Schemas": null,
+   "SelectedHandlebarsLanguage": 0,
+   "SelectedToBeGenerated": 0,
+   "Tables": [
+      {
+         "Name": "[dbo].[ActionsLog]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[ActionTypes]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Campaigns]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[CampaignsMissions]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Characters]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Evidences]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Messages]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[MessageTemplates]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Missions]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Teams]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[TeamsCharacters]",
+         "ObjectType": 0
+      }
+   ],
+   "UiHint": "bogdb20.GOC.dbo",
+   "UncountableWords": null,
+   "UseBoolPropertiesWithoutDefaultSql": false,
+   "UseDatabaseNames": false,
+   "UseDateOnlyTimeOnly": false,
+   "UseDbContextSplitting": false,
+   "UseFluentApiOnly": true,
+   "UseHandleBars": false,
+   "UseHierarchyId": false,
+   "UseInflector": false,
+   "UseLegacyPluralizer": false,
+   "UseManyToManyEntity": false,
+   "UseNoDefaultConstructor": false,
+   "UseNoObjectFilter": false,
+   "UseNodaTime": false,
+   "UseNullableReferences": false,
+   "UseSchemaFolders": false,
+   "UseSpatial": false,
+   "UseT4": false
+}

@@ -1,8 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace goc_api.Controllers
+namespace Goc.Api.Controllers
 {
     using System.Data.SqlClient;
+    using Goc.Api;
 
     [ApiController]
     [Route("[controller]")]
@@ -20,7 +21,7 @@ namespace goc_api.Controllers
         public WeatherForecastController(ILogger<WeatherForecastController> logger, IConfiguration config)
         {
             _logger = logger;
-            this.myConnectionString = config.GetConnectionString("db");
+            myConnectionString = config.GetConnectionString("db");
         }
 
 
@@ -28,7 +29,7 @@ namespace goc_api.Controllers
         [Route("/pingdb")]
         public IEnumerable<string> PingDb()
         {
-            using var conn = new SqlConnection(this.myConnectionString);
+            using var conn = new SqlConnection(myConnectionString);
             conn.Open();
             using var command = conn.CreateCommand();
             command.CommandText = "SELECT name FROM sys.tables";
@@ -51,7 +52,15 @@ namespace goc_api.Controllers
             })
             .ToArray();
         }
+
+        [HttpPost]
+        [Route("/TestPost")]
+        public Task TestPostAsync()
+        {
+            Console.WriteLine("test post");
+            return Task.CompletedTask;
+        }
     }
 
-   
+
 }

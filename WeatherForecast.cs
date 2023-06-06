@@ -1,4 +1,4 @@
-namespace goc_api
+namespace Goc.Api
 {
     public class WeatherForecast
     {
