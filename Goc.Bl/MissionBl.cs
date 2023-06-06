@@ -13,16 +13,16 @@ public class MissionBl : IMissionBl
         this._context = context;
     }
 
-    public async Task<Missions?> Get(int id)
+    public async Task<Missions> GetAsync(int id)
     {
-        var mission = await _context.Teams.FindAsync(id);
+        var mission = await _context.Missions.FindAsync(id);
 
         return mission;
     }
 
-    public async Task<List<Missions>> GetAll()
+    public async Task<List<Missions>> GetAllAsync()
     {
-        var missions = await _context.Teams.ToListAsync();
+        var missions = await _context.Missions.ToListAsync();
 
         return missions;
     }

@@ -13,14 +13,14 @@ public class TeamBl : ITeamBl
         this._context = context;
     }
 
-    public async Task<Teams?> Get(int id)
+    public async Task<Teams?> GetAsync(int id)
     {
         var team = await _context.Teams.FindAsync(id);
 
         return team;
     }
 
-    public async Task<List<Teams>> GetAll()
+    public async Task<List<Teams>> GetAllAsync()
     {
         var teams = await _context.Teams.ToListAsync();
 

@@ -1,4 +1,5 @@
 ﻿using Goc.Api.Dtos;
+using Goc.Api.Extensions;
 using Goc.Business.Contracts;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,26 +19,26 @@ namespace Goc.Api.Controllers
 
         [HttpGet]
         [Route("All")]
-        public async Task<ActionResult<List<Models.Teams>>> GetAllTeams()
+        public async Task<ActionResult<List<TeamsDto>>> GetAllTeams()
         {
-            var teams = await _temaBl.GetAll();
+            var teams = await _temaBl.GetAllAsync();
 
-            return teams;
+            return teams.ToDto();
         }
 
 
 
         [HttpGet]
         [Route("{id}")]
-        public async Task<ActionResult<Models.Teams>> Get(int id)
+        public async Task<ActionResult<TeamsDto>> Get(int id)
         {
-            var teams = await _temaBl.Get(id);
-            if (teams == null)
+            var team = await _temaBl.GetAsync(id);
+            if (team == null)
             {
                 return NotFound();
             }
 
-            return teams;
+            return team.ToDto();
         }
 
         [HttpGet]

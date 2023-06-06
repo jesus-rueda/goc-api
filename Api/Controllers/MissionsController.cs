@@ -1,5 +1,6 @@
-﻿using Goc.Business.Contracts;
-using Goc.Models;
+﻿using Goc.Api.Dtos;
+using Goc.Api.Extensions;
+using Goc.Business.Contracts;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Goc.Api.Controllers
@@ -12,15 +13,24 @@ namespace Goc.Api.Controllers
 
         public MissionsController(IMissionBl missionBl)
         {
-            this._missionBl = missionBl;
+            _missionBl = missionBl;
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<Missions>>> GetMissions()
+        [Route("{id}")]
+        public async Task<ActionResult<MissionsDto>> Get(int id)
         {
-            var missiosn = await _missionBl.GetAll();
+            var missions = await _missionBl.GetAsync(id);
 
-            return missiosn;
+            return missions.ToDto();
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<List<MissionsDto>>> GetMissions()
+        {
+            var missions = await _missionBl.GetAllAsync();
+
+            return missions.ToDto();
 
             //var missiosn = new List<Missions>()
             //{
