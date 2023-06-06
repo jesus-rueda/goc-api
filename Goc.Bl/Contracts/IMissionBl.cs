@@ -6,8 +6,8 @@ namespace Goc.Business.Contracts
 {
     public interface IMissionBl
     {
-        Task<List<MissionsDto>> GetAllAsync();
-
         Task<MissionsDto> GetAsync(int id);
+
+        Task<List<MissionsDto>> GetCampaignMissionsAsync(int campaignId);
     }
 }
