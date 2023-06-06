@@ -37,10 +37,13 @@ public class EvidenceBl : IEvidenceBl
             throw new Exception("team not found");
         }
 
-        var affectedTeam = await _context.Teams.FindAsync(affectedTeamId);
-        if (affectedTeam == null)
+        if (actionId == 1) // Attack
         {
-            throw new Exception("Affected team not found");
+            var affectedTeam = await _context.Teams.FindAsync(affectedTeamId);
+            if (affectedTeam == null)
+            {
+                throw new Exception("Affected team not found");
+            }
         }
 
         var teamCharacter = await _context.TeamsCharacters.FindAsync(teamCharacterId);
