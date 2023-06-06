@@ -19,7 +19,7 @@ builder.Services.AddCors(options => options.AddPolicy("CorsPolicy",
 
 
 builder.Services.AddDbContext<GocContext>(option => option.UseSqlServer(builder.Configuration.GetConnectionString("db")));
-builder.Services.AddBussines();
+builder.Services.AddBusiness();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

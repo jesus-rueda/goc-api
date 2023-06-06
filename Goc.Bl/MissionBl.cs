@@ -15,15 +15,13 @@ public class MissionBl : IMissionBl
 
     public async Task<Missions?> Get(int id)
     {
-        var mission = await _context.Teams.FindAsync(id);
-
+        var mission = await _context.Missions.FindAsync(id);
         return mission;
     }
 
     public async Task<List<Missions>> GetAll()
     {
-        var missions = await _context.Teams.ToListAsync();
-
+        var missions = await _context.Missions.ToListAsync();
         return missions;
     }
 }

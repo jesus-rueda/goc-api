@@ -18,9 +18,9 @@ namespace Goc.Api.Controllers
         [HttpGet]
         public async Task<ActionResult<List<Missions>>> GetMissions()
         {
-            var missiosn = await _missionBl.GetAll();
+            var missions = await _missionBl.GetAll();
 
-            return missiosn;
+            return missions;
 
             //var missiosn = new List<Missions>()
             //{

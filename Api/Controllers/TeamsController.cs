@@ -8,30 +8,27 @@ namespace Goc.Api.Controllers
     [Route("api/[controller]")]
     public class TeamsController : ControllerBase
     {
-        private readonly ITeamBl _temaBl;
+        private readonly ITeamBl _teamBl;
 
         public TeamsController(ITeamBl teamsBl)
         {
-            _temaBl = teamsBl;
+            _teamBl = teamsBl;
         }
-
-
+        
         [HttpGet]
         [Route("All")]
         public async Task<ActionResult<List<Models.Teams>>> GetAllTeams()
         {
-            var teams = await _temaBl.GetAll();
+            var teams = await _teamBl.GetAll();
 
             return teams;
         }
-
-
-
+        
         [HttpGet]
         [Route("{id}")]
         public async Task<ActionResult<Models.Teams>> Get(int id)
         {
-            var teams = await _temaBl.Get(id);
+            var teams = await _teamBl.Get(id);
             if (teams == null)
             {
                 return NotFound();
