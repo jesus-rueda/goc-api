@@ -43,6 +43,11 @@ public static class MapDtoExtensions
 
     public static TeamCharacterProfileDto ToDto(this TeamsCharacters teamCharacter)
     {
+        if(teamCharacter == null)
+        {
+            return null;
+        }
+
         return new TeamCharacterProfileDto
         {
             Id = teamCharacter.Id,
