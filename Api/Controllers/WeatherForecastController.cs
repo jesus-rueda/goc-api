@@ -8,6 +8,8 @@ namespace Goc.Api.Controllers
     using System.Linq;
     using System.Threading.Tasks;
     using Goc.Api;
+    using Goc.Api.Hubs;
+    using Microsoft.AspNetCore.SignalR;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.Logging;
 
@@ -21,12 +23,13 @@ namespace Goc.Api.Controllers
     };
 
         private readonly ILogger<WeatherForecastController> _logger;
-
+        private readonly IHubContext<NotificationHub> notificationHub;
         private readonly string myConnectionString;
 
-        public WeatherForecastController(ILogger<WeatherForecastController> logger, IConfiguration config)
+        public WeatherForecastController(ILogger<WeatherForecastController> logger, IConfiguration config, IHubContext<NotificationHub> notificationHub)
         {
             _logger = logger;
+            this.notificationHub = notificationHub;
             myConnectionString = config.GetConnectionString("db");
         }
 
@@ -65,6 +68,14 @@ namespace Goc.Api.Controllers
         {
             Console.WriteLine("test post");
             return Task.CompletedTask;
+        }
+
+        [HttpGet]
+        [Route("/TestNotification")]
+        public async Task<IActionResult> TestNotification()
+        {
+            await notificationHub.Clients.All.SendAsync("RecieveMessage", "Hola Mario");
+            return Ok();
         }
     }
 
