@@ -28,12 +28,7 @@ namespace Goc.Api.Controllers
         {
             var actionString = this.Request.Form["action"];
             var action = JsonConvert.DeserializeObject<ActionsLogDto>(actionString);
-
-            if (missionId != action.MissionId)
-            {
-                return BadRequest();
-            }
-
+            
             var imageBase64 = "";
             if (formFile.Length > 0 && action.ActionTypeId != 2)
             {

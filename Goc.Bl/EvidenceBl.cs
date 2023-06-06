@@ -27,12 +27,8 @@ public class EvidenceBl : IEvidenceBl
     public async Task<EvidencesDto> CreateAsync(int missionId, int teamId, int actionId, int teamCharacterId, int? affectedTeamId, string image)
     {
         //Validations
-        var mission = await _context.Missions.FindAsync(missionId);
-        if (mission == null)
-        {
-            throw new Exception("Mission not found");
-        }
-
+        var mission = await this.GetMission(missionId);
+        
         var team = await _context.Teams.FindAsync(teamId);
         if (team == null)
         {
@@ -66,7 +62,7 @@ public class EvidenceBl : IEvidenceBl
         {
             var actionLog = new ActionsLog()
             {
-                MissionId = missionId,
+                MissionId = mission.Id,
                 TeamId = teamId,
                 TeamCharacterId = teamCharacterId,
                 ActionTypeId = actionId,
@@ -138,18 +134,29 @@ public class EvidenceBl : IEvidenceBl
         return coinks;
     }
 
-    //internal async Task<int> GetTeamMissionActions(int teamId, int missionId)
-    //{
-    //    var actionsCount = await _context.ActionsLog
-    //        .Include(a => a.Evidences)
-    //        .SelectMany(a => a.Evidences.)
-    //        .Where(a => a.TeamId == teamId && a.MissionId == missionId && a.Evidences.is)
-    //        .GroupBy(a => a.TeamCharacterId)
-    //        .CountAsync();
-    //    return actionsCount;
-    //}
+    internal async Task UpdateCoinksBalance(int teamId, int missionId)
+    {
+        var actionsCount = await _context.ActionsLog
+            .Include(a => a.Evidences)
+            .Where(a => a.TeamId == teamId && a.MissionId == missionId && a.Evidences.FirstOrDefault().IsValid)
+            .GroupBy(a => a.TeamCharacterId)
+            .CountAsync();
+    }
+    
+    private async Task<Missions> GetMission(int missionId)
+    {
+        if (missionId <= 0)
+        {
+            return await _context.Missions.FirstOrDefaultAsync(m =>
+                m.StartDate <= DateTime.UtcNow && m.EndDate >= DateTime.UtcNow);
+        }
 
-    //internal Task UpdateCoinksBalance(int teamId, int missionId)
-    //{
-    //}
+        var mission = await _context.Missions.FindAsync(missionId);
+        if (mission == null)
+        {
+            throw new Exception("Mission not found");
+        }
+
+        return mission;
+    }
 }
