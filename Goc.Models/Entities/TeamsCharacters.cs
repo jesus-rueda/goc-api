@@ -7,12 +7,18 @@ namespace Goc.Models
 {
     public partial class TeamsCharacters
     {
+        public TeamsCharacters()
+        {
+            ActionsLog = new HashSet<ActionsLog>();
+        }
+
         public int Id { get; set; }
         public int TeamId { get; set; }
         public int CharacterId { get; set; }
         public string Email { get; set; }
         public int IsLeader { get; set; }
 
+        public virtual ICollection<ActionsLog> ActionsLog { get; set; }
         public virtual Characters Character { get; set; }
         public virtual Teams Team { get; set; }
     }

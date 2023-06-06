@@ -9,7 +9,6 @@ namespace Goc.Api.Dtos
     {
         public Characters()
         {
-            ActionsLog = new HashSet<ActionsLog>();
             Evidences = new HashSet<Evidences>();
             TeamsCharacters = new HashSet<TeamsCharacters>();
         }
@@ -20,8 +19,7 @@ namespace Goc.Api.Dtos
         public string Attack { get; set; }
         public string Defense { get; set; }
         public string Bonus { get; set; }
-
-        public virtual ICollection<ActionsLog> ActionsLog { get; set; }
+        
         public virtual ICollection<Evidences> Evidences { get; set; }
         public virtual ICollection<TeamsCharacters> TeamsCharacters { get; set; }
     }

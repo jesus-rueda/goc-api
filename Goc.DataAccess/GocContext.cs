@@ -53,10 +53,10 @@ public partial class GocContext : DbContext
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_ActionsLog_ActionTypes");
 
-            entity.HasOne(d => d.Character)
+            entity.HasOne(d => d.TeamCharacter)
                 .WithMany(p => p.ActionsLog)
-                .HasForeignKey(d => d.CharacterId)
-                .HasConstraintName("FK_ActionsLog_Characters");
+                .HasForeignKey(d => d.TeamCharacterId)
+                .HasConstraintName("FK_ActionsLog_TeamsCharacters");
 
             entity.HasOne(d => d.Mission)
                 .WithMany(p => p.ActionsLog)
