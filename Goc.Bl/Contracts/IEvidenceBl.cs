@@ -10,5 +10,5 @@ public interface IEvidenceBl
 
     Task<EvidencesDto> GetAsync(int id);
 
-    Task<EvidencesDto> CreateAsync(int missionId, int teamId, int actionId, int characterId, int? affectedTeamId, string image);
+    Task<EvidencesDto> CreateAsync(int missionId, int teamId, int actionId, int teamCharacterId, int? affectedTeamId, string image);
 }

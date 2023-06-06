@@ -47,9 +47,8 @@ namespace Goc.Api.Controllers
 
             try
             {
-                var evicence = await _evidenceBl.CreateAsync(action.MissionId, action.TeamId, action.ActionTypeId, action.TeamCharacterId, action.AffectedTeamId, imageBase64);
-
-                return evicence;
+                var evidence = await _evidenceBl.CreateAsync(action.MissionId, action.TeamId, action.ActionTypeId, action.TeamCharacterId, action.AffectedTeamId, imageBase64);
+                return evidence;
             }
             catch (Exception exc)
             {

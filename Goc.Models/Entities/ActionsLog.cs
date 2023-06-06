@@ -23,7 +23,8 @@ namespace Goc.Models
         public int Coinks { get; set; }
 
         public virtual ActionTypes ActionType { get; set; }
-        public virtual Characters Character { get; set; }
+
+        public virtual TeamsCharacters TeamCharacter { get; set; }
         public virtual Missions Mission { get; set; }
         public virtual Teams Team { get; set; }
         public virtual ICollection<Evidences> Evidences { get; set; }

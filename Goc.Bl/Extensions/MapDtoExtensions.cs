@@ -66,7 +66,7 @@ public static class MapDtoExtensions
         {
             Id = evidence.Id,
             ActionLogId = evidence.ActionLogId,
-            CharacterId = evidence.CharacterId,
+            TeamCharacterId = evidence.TeamCharacterId,
             Image = evidence.Image,
             IsValid = evidence.IsValid,
         };

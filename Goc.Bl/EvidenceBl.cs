@@ -22,7 +22,7 @@ public class EvidenceBl : IEvidenceBl
         this._context = context;
     }
 
-    public async Task<EvidencesDto> CreateAsync(int missionId, int teamId, int actionId, int characterId, int? affectedTeamId, string image)
+    public async Task<EvidencesDto> CreateAsync(int missionId, int teamId, int actionId, int teamCharacterId, int? affectedTeamId, string image)
     {
         //Validations
         var mission = await _context.Missions.FindAsync(missionId);
@@ -43,7 +43,7 @@ public class EvidenceBl : IEvidenceBl
             throw new Exception("Affected team not found");
         }
 
-        var teamCharacter = await _context.TeamsCharacters.FindAsync(characterId);
+        var teamCharacter = await _context.TeamsCharacters.FindAsync(teamCharacterId);
         if (teamCharacter == null)
         {
             throw new Exception("Character not found");
@@ -63,7 +63,7 @@ public class EvidenceBl : IEvidenceBl
             {
                 MissionId = missionId,
                 TeamId = teamId,
-                TeamCharacterId = characterId,
+                TeamCharacterId = teamCharacterId,
                 ActionTypeId = actionId,
                 AffectedTeamId = action.Id == 1 ? affectedTeamId : null,
                 DateTimeTo = date,
@@ -74,24 +74,21 @@ public class EvidenceBl : IEvidenceBl
             _context.ActionsLog.Add(actionLog);
 
             var rowAffected = await _context.SaveChangesAsync();
-            if (rowAffected == 0) throw new Exception("The evicence could not be created");
+            if (rowAffected == 0) throw new Exception("The evidence could not be created");
 
-            Evidences evidence = new Evidences()
+            var evidence = new Evidences()
             {
                 ActionLogId = actionLog.Id,
-                CharacterId = actionLog.TeamCharacterId,
+                TeamCharacterId = actionLog.TeamCharacterId,
                 Image = image,
                 IsValid = true
             };
 
             _context.Evidences.Add(evidence);
             rowAffected = await _context.SaveChangesAsync();
-            if (rowAffected == 0) throw new Exception("The evicence could not be created");
-
-
+            if (rowAffected == 0) throw new Exception("The evidence could not be created");
 
             transaction.Commit();
-
             return evidence.ToDto();
         }
         catch (Exception)

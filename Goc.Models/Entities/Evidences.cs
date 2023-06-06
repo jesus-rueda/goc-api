@@ -9,11 +9,11 @@ namespace Goc.Models
     {
         public long Id { get; set; }
         public long ActionLogId { get; set; }
-        public int CharacterId { get; set; }
+        public int TeamCharacterId { get; set; }
         public string Image { get; set; }
         public bool IsValid { get; set; }
 
         public virtual ActionsLog ActionLog { get; set; }
-        public virtual Characters Character { get; set; }
+        public virtual TeamsCharacters TeamCharacter { get; set; }
     }
 }
