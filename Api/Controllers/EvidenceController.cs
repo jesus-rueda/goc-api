@@ -3,10 +3,10 @@ using System.IO;
 using System.Threading.Tasks;
 using Goc.Business.Contracts;
 using Goc.Business.Dtos;
-using Goc.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Newtonsoft.Json;
 
 namespace Goc.Api.Controllers
 {
@@ -25,16 +25,17 @@ namespace Goc.Api.Controllers
         [HttpPost]
         [Route("{missionId}")]
         public async Task<ActionResult<EvidencesDto>> Create(IFormFile formFile, [FromRoute] int missionId)
-        //public async Task<ActionResult<EvidencesDto>> Create([FromRoute] int missionId, ActionsLogDto action)
         {
-            var action = new ActionsLog();
+            var actionString = this.Request.Form["action"];
+            var action = JsonConvert.DeserializeObject<ActionsLogDto>(actionString);
+
             if (missionId != action.MissionId)
             {
                 return BadRequest();
             }
 
             var imageBase64 = "";
-            if (formFile.Length > 0)
+            if (formFile.Length > 0 && action.ActionTypeId != 2)
             {
                 using (MemoryStream ms = new MemoryStream())
                 {
@@ -42,13 +43,18 @@ namespace Goc.Api.Controllers
                     byte[] fileBytes = ms.ToArray();
                     imageBase64 = Convert.ToBase64String(fileBytes);
                 }
+            }
 
+            try
+            {
                 var evicence = await _evidenceBl.CreateAsync(action.MissionId, action.TeamId, action.ActionTypeId, action.TeamCharacterId, action.AffectedTeamId, imageBase64);
 
                 return evicence;
             }
-
-            return BadRequest();
+            catch (Exception exc)
+            {
+                return BadRequest(exc.Message);
+            }
         }
     }
 }

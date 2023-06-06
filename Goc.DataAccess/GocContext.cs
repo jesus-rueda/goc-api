@@ -41,7 +41,7 @@ public partial class GocContext : DbContext
 
         modelBuilder.Entity<ActionsLog>(entity =>
         {
-            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.Id).UseIdentityColumn();
 
             entity.Property(e => e.DateTimeFrom).HasColumnType("smalldatetime");
 
@@ -124,7 +124,7 @@ public partial class GocContext : DbContext
 
         modelBuilder.Entity<Evidences>(entity =>
         {
-            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.Id).UseIdentityColumn();
 
             entity.Property(e => e.Image)
                 .IsRequired()
