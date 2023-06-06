@@ -55,8 +55,8 @@ public partial class GocContext : DbContext
 
             entity.HasOne(d => d.Character)
                 .WithMany(p => p.ActionsLog)
-                .HasForeignKey(d => d.CharacterId)
-                .HasConstraintName("FK_ActionsLog_Characters");
+                .HasForeignKey(d => d.TeamCharacterId)
+                .HasConstraintName("FK_ActionsLog_TeamsCharacters");
 
             entity.HasOne(d => d.Mission)
                 .WithMany(p => p.ActionsLog)

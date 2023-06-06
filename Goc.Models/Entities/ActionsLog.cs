@@ -14,7 +14,7 @@ namespace Goc.Models
 
         public long Id { get; set; }
         public int TeamId { get; set; }
-        public int? CharacterId { get; set; }
+        public int TeamCharacterId { get; set; }
         public int ActionTypeId { get; set; }
         public int? AffectedTeamId { get; set; }
         public DateTime DateTimeFrom { get; set; }

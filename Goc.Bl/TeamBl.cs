@@ -12,10 +12,10 @@ public class TeamBl : ITeamBl
 
     public TeamBl(GocContext context)
     {
-        this._context = context;
+        _context = context;
     }
 
-    public async Task<Teams?> GetAsync(int id)
+    public async Task<Teams> GetAsync(int id)
     {
         var team = await _context.Teams.FindAsync(id);
 

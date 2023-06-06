@@ -12,6 +12,6 @@ namespace Goc.Api.Dtos
         public string Body { get; set; }
         public int ActionTypeId { get; set; }
 
-        public virtual ActionTypes ActionType { get; set; }
+        public virtual ActionTypesDto ActionType { get; set; }
     }
 }
