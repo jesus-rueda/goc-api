@@ -1,18 +1,43 @@
 ﻿using Goc.Api.Dtos;
-using Goc.Models;
+using Goc.Business.Contracts;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Goc.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class TeamsController
+    public class TeamsController : ControllerBase
     {
-        private readonly GocContext context;
+        private readonly ITeamBl _temaBl;
 
-        public TeamsController(GocContext context)
+        public TeamsController(ITeamBl teamsBl)
         {
-            this.context = context;
+            _temaBl = teamsBl;
+        }
+
+
+        [HttpGet]
+        [Route("All")]
+        public async Task<ActionResult<List<Models.Teams>>> GetAllTeams()
+        {
+            var teams = await _temaBl.GetAll();
+
+            return teams;
+        }
+
+
+
+        [HttpGet]
+        [Route("{id}")]
+        public async Task<ActionResult<Models.Teams>> Get(int id)
+        {
+            var teams = await _temaBl.Get(id);
+            if (teams == null)
+            {
+                return NotFound();
+            }
+
+            return teams;
         }
 
         [HttpGet]
