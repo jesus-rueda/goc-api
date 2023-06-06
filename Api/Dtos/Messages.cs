@@ -13,7 +13,7 @@ namespace Goc.Api.Dtos
         public string Message { get; set; }
         public DateTime DateTime { get; set; }
 
-        public virtual Teams RecipientTeamNavigation { get; set; }
-        public virtual Teams SenderTeamNavigation { get; set; }
+        public virtual TeamsDto RecipientTeamNavigation { get; set; }
+        public virtual TeamsDto SenderTeamNavigation { get; set; }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Goc.Models;
+﻿using System.Threading.Tasks;
+using Goc.Models;
 
 namespace Goc.Business.Contracts;
 

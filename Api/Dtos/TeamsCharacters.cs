@@ -14,6 +14,6 @@ namespace Goc.Api.Dtos
         public int IsLeader { get; set; }
 
         public virtual Characters Character { get; set; }
-        public virtual Teams Team { get; set; }
+        public virtual TeamsDto Team { get; set; }
     }
 }

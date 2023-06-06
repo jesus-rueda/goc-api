@@ -2,8 +2,14 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Goc.Api.Controllers
 {
+    using System;
+    using System.Collections.Generic;
     using System.Data.SqlClient;
+    using System.Linq;
+    using System.Threading.Tasks;
     using Goc.Api;
+    using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.Logging;
 
     [ApiController]
     [Route("[controller]")]

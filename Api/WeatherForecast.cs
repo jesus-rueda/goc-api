@@ -1,3 +1,5 @@
+using System;
+
 namespace Goc.Api
 {
     public class WeatherForecast

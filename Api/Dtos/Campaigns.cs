@@ -9,7 +9,7 @@ namespace Goc.Api.Dtos
     {
         public Campaigns()
         {
-            Mission = new HashSet<Missions>();
+            Mission = new HashSet<MissionsDto>();
         }
 
         public int Id { get; set; }
@@ -17,6 +17,6 @@ namespace Goc.Api.Dtos
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
 
-        public virtual ICollection<Missions> Mission { get; set; }
+        public virtual ICollection<MissionsDto> Mission { get; set; }
     }
 }

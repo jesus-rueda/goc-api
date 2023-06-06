@@ -1,4 +1,5 @@
-﻿using Goc.Business.Contracts;
+﻿using System.Threading.Tasks;
+using Goc.Business.Contracts;
 using Goc.Models;
 using Microsoft.AspNetCore.Mvc;
 

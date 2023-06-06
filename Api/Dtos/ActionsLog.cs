@@ -24,7 +24,7 @@ public partial class ActionsLog
 
     public virtual ActionTypes ActionType { get; set; }
     public virtual Characters Character { get; set; }
-    public virtual Missions Mission { get; set; }
-    public virtual Teams Team { get; set; }
+    public virtual MissionsDto Mission { get; set; }
+    public virtual TeamsDto Team { get; set; }
     public virtual ICollection<Evidences> Evidences { get; set; }
 }
