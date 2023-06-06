@@ -26,7 +26,7 @@ namespace Goc.Api.Controllers
             return missions;
         }
 
-        [HttpGet("/campaignId/{campaignId}")]
+        [HttpGet("/api/Campaigns/{campaignId}/Missions")]
         public async Task<ActionResult<List<MissionsDto>>> GetCampaignMissions(int campaignId)
         {
             return await _missionBl.GetCampaignMissionsAsync(campaignId);
