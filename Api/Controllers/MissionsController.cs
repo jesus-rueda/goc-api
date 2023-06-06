@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Goc.Api.Dtos;
-using Goc.Api.Extensions;
 using Goc.Business.Contracts;
+using Goc.Business.Dtos;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Goc.Api.Controllers
@@ -24,15 +23,15 @@ namespace Goc.Api.Controllers
         {
             var missions = await _missionBl.GetAsync(id);
 
-            return missions.ToDto();
+            return missions;
         }
 
-        [HttpGet]
+        [HttpGet("All")]
         public async Task<ActionResult<List<MissionsDto>>> GetMissions()
         {
             var missions = await _missionBl.GetAllAsync();
 
-            return missions.ToDto();
+            return missions;
 
             //var missiosn = new List<Missions>()
             //{

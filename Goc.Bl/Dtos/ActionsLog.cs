@@ -2,6 +2,7 @@
 #nullable disable
 using System;
 using System.Collections.Generic;
+using Goc.Business.Dtos;
 
 namespace Goc.Api.Dtos;
 

@@ -1,6 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Goc.Business.Contracts;
+using Goc.Business.Dtos;
+using Goc.Business.Extensions;
 using Goc.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,21 +15,38 @@ public class MissionBl : IMissionBl
 
     public MissionBl(GocContext context)
     {
-        this._context = context;
+        _context = context;
     }
 
-    public async Task<Missions> GetAsync(int id)
+    public async Task<MissionsDto> GetAsync(int id)
     {
         var mission = await _context.Missions.FindAsync(id);
 
-        return mission;
+        var missionDto = mission.ToDto();
+        missionDto.Status = GetMissionStatus(missionDto, DateTime.Now);
+
+        return missionDto;
     }
 
-    public async Task<List<Missions>> GetAllAsync()
+    public async Task<List<MissionsDto>> GetAllAsync()
     {
         var missions = await _context.Missions.ToListAsync();
+        var missionsDto = missions.ToDto();
+        missionsDto.ForEach(m =>
+        {
+            m.Status = GetMissionStatus(m, DateTime.Now);
+        });
 
-        return missions;
+        return missionsDto;
+    }
+
+    public string GetMissionStatus(MissionsDto mission, DateTime date)
+    {
+        if (mission.StartDate > date) return "Planed";
+
+        if (mission.EndDate < date) return "Closed";
+
+        return "Active";
     }
 }
 

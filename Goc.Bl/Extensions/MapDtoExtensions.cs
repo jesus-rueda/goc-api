@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Goc.Api.Dtos;
+using Goc.Business.Dtos;
 using Goc.Models;
 
-namespace Goc.Api.Extensions;
+namespace Goc.Business.Extensions;
 
 public static class MapDtoExtensions
 {
@@ -23,7 +23,7 @@ public static class MapDtoExtensions
 
     public static List<MissionsDto> ToDto(this List<Missions> mission)
     {
-        return mission.Select(m => ToDto(m)).ToList();
+        return mission.Select(m => m.ToDto()).ToList();
     }
 
     public static TeamsDto ToDto(this Teams teams)
@@ -38,6 +38,6 @@ public static class MapDtoExtensions
 
     public static List<TeamsDto> ToDto(this List<Teams> teams)
     {
-        return teams.Select(t => ToDto(t)).ToList();
+        return teams.Select(t => t.ToDto()).ToList();
     }
 }

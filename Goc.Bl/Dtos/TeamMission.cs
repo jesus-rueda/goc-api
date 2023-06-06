@@ -1,4 +1,4 @@
-﻿namespace Goc.Api.Dtos
+﻿namespace Goc.Business.Dtos
 {
     public class TeamMission
     {

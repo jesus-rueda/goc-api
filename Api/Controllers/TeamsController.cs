@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Goc.Api.Dtos;
-using Goc.Api.Extensions;
 using Goc.Business.Contracts;
+using Goc.Business.Dtos;
+using Goc.Business.Extensions;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Goc.Api.Controllers

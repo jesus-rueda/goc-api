@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace Goc.Api.Dtos;
+namespace Goc.Business.Dtos;
 
-public partial class MissionsDto
+public class MissionsDto
 {
     public int Id { get; set; }
     public string Name { get; set; }
@@ -11,4 +11,5 @@ public partial class MissionsDto
     public int Coinks { get; set; }
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
+    public string Status { get; set; }
 }

@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Goc.Models;
+using Goc.Business.Dtos;
 
 namespace Goc.Business.Contracts
 {
     public interface IMissionBl
     {
-        Task<List<Missions>> GetAllAsync();
+        Task<List<MissionsDto>> GetAllAsync();
 
-        Task<Missions?> GetAsync(int id);
+        Task<MissionsDto> GetAsync(int id);
     }
 }
