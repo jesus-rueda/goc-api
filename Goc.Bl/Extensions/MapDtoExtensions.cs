@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Goc.Api.Dtos;
 using Goc.Business.Dtos;
 using Goc.Models;
 
@@ -75,5 +76,22 @@ public static class MapDtoExtensions
     public static List<EvidencesDto> ToDto(this List<Evidences> evidences)
     {
         return evidences.Select(t => t.ToDto()).ToList();
+    }
+
+    public static MessagesDto ToDto(this Messages message)
+    {
+        return new MessagesDto
+        {
+            Id = message.Id,
+            SenderTeam = message.SenderTeam,
+            RecipientTeam = message.RecipientTeam,
+            Message = message.Message,
+            DateTime = message.DateTime,
+        };
+    }
+
+    public static List<MessagesDto> ToDto(this List<Messages> messages)
+    {
+        return messages.Select(m => m.ToDto()).ToList();
     }
 }

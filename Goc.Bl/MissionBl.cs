@@ -31,7 +31,7 @@ public class MissionBl : IMissionBl
 
     public async Task<List<MissionsDto>> GetCampaignMissionsAsync(int campaignId)
     {
-        var missions = await _context.Missions.Where(c=> c.Campaign.FirstOrDefault().Id == campaignId).ToListAsync();
+        var missions = await _context.Missions.Where(c => c.Campaign.FirstOrDefault().Id == campaignId).ToListAsync();
         var missionsDto = missions.ToDto();
         missionsDto.ForEach(m =>
         {
@@ -47,4 +47,3 @@ public class MissionBl : IMissionBl
         return mission.EndDate < date ? "Closed" : "Active";
     }
 }
-

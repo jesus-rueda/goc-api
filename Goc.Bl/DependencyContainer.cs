@@ -12,6 +12,8 @@ public static class DependencyContainer
         services.AddScoped<ITeamBl, TeamBl>();
         services.AddScoped<IMissionBl, MissionBl>();
         services.AddScoped<IEvidenceBl, EvidenceBl>();
+        services.AddScoped<IMessageBl, MessageBl>();
+
         return services;
     }
 }
