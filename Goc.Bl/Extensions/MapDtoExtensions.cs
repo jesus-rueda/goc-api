@@ -1,4 +1,9 @@
-﻿namespace Goc.Business.Extensions;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Goc.Business.Dtos;
+using Goc.Models;
+
+namespace Goc.Business.Extensions;
 
 public static class MapDtoExtensions
 {
