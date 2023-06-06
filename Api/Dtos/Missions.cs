@@ -15,6 +15,7 @@ namespace Goc.Api.Dtos
 
         public int Id { get; set; }
         public string Name { get; set; }
+        public string Story { get; set; }
         public string Instructions { get; set; }
         public int Coinks { get; set; }
         public DateTime StartDate { get; set; }
