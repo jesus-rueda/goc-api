@@ -10,7 +10,7 @@ namespace Goc.Models
         public int Id { get; set; }
         public int TeamId { get; set; }
         public int CharacterId { get; set; }
-        public bool Email { get; set; }
+        public string Email { get; set; }
         public int IsLeader { get; set; }
 
         public virtual Characters Character { get; set; }

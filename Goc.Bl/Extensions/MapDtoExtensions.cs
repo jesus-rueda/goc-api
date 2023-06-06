@@ -40,4 +40,18 @@ public static class MapDtoExtensions
     {
         return teams.Select(t => t.ToDto()).ToList();
     }
+
+    public static TeamCharacterProfileDto ToDto(this TeamsCharacters teamCharacter)
+    {
+        return new TeamCharacterProfileDto
+        {
+            Id = teamCharacter.Id,
+            Email = teamCharacter.Email,
+            CharacterId = teamCharacter.CharacterId,
+            CharacterName = teamCharacter.Character.Name,
+            IsLeader = teamCharacter.IsLeader,
+            TeamId = teamCharacter.TeamId,
+            TeamName = teamCharacter.Team.Name
+        };
+    }
 }
