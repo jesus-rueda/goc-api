@@ -26,35 +26,10 @@ namespace Goc.Api.Controllers
             return missions;
         }
 
-        [HttpGet("All")]
-        public async Task<ActionResult<List<MissionsDto>>> GetMissions()
+        [HttpGet("/api/Campaigns/{campaignId}/Missions")]
+        public async Task<ActionResult<List<MissionsDto>>> GetCampaignMissions(int campaignId)
         {
-            var missions = await _missionBl.GetAllAsync();
-
-            return missions;
-
-            //var missiosn = new List<Missions>()
-            //{
-            //    new()
-            //    {
-            //        Id = 1, Name = "Mission 1",
-            //        StartDate = DateTime.Now,
-            //        EndDate = DateTime.Now.AddDays(30),
-            //        Instructions = "Instructions mission 1",
-            //        Coinks = 2500
-            //    },
-
-            //    new()
-            //    {
-            //        Id = 2, Name = "Mission 2",
-            //        StartDate = DateTime.Now.AddMonths(1),
-            //        EndDate = DateTime.Now.AddMonths(1),
-            //        Instructions = "Instructions mission 2",
-            //        Coinks = 5000
-            //    }
-            //};
-
-            //return await Task.FromResult(missiosn);
+            return await _missionBl.GetCampaignMissionsAsync(campaignId);
         }
     }
 }

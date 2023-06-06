@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using System.Threading.Tasks;
 using Goc.Business.Contracts;
 using Goc.Models;
@@ -15,9 +15,9 @@ public class CampaignBl : ICampaignBl
         _context = context;
     }
 
-    public async Task<List<Campaigns>> GetAll()
+    public async Task<Campaigns> GetActive()
     {
-        var campaigns = await _context.Campaigns.ToListAsync();
-        return campaigns;
+        return await _context.Campaigns.FirstOrDefaultAsync(c =>
+            c.StartDate <= DateTime.UtcNow && c.EndDate >= DateTime.UtcNow);
     }
 }

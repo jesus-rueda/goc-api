@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Goc.Business.Contracts;
 using Goc.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -18,10 +17,9 @@ public class CampaignsController : ControllerBase
     }
 
     [HttpGet]
-    [Route("All")]
-    public async Task<ActionResult<List<Campaigns>>> GetAll()
+    [Route("Active")]
+    public async Task<ActionResult<Campaigns>> GetActive()
     {
-        var campaigns = await _campaignBl.GetAll();
-        return campaigns;
+        return await _campaignBl.GetActive();
     }
 }

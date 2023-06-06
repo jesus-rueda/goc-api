@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Goc.Business.Contracts;
 using Goc.Business.Dtos;
@@ -28,9 +29,9 @@ public class MissionBl : IMissionBl
         return missionDto;
     }
 
-    public async Task<List<MissionsDto>> GetAllAsync()
+    public async Task<List<MissionsDto>> GetCampaignMissionsAsync(int campaignId)
     {
-        var missions = await _context.Missions.ToListAsync();
+        var missions = await _context.Missions.Where(c=> c.Campaign.FirstOrDefault().Id == campaignId).ToListAsync();
         var missionsDto = missions.ToDto();
         missionsDto.ForEach(m =>
         {
@@ -42,11 +43,8 @@ public class MissionBl : IMissionBl
 
     public string GetMissionStatus(MissionsDto mission, DateTime date)
     {
-        if (mission.StartDate > date) return "Planed";
-
-        if (mission.EndDate < date) return "Closed";
-
-        return "Active";
+        if (mission.StartDate > date) return "Planned";
+        return mission.EndDate < date ? "Closed" : "Active";
     }
 }
 

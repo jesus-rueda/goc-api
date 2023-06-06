@@ -1,9 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Goc.Business.Dtos;
-using Goc.Models;
-
-namespace Goc.Business.Extensions;
+﻿namespace Goc.Business.Extensions;
 
 public static class MapDtoExtensions
 {
@@ -39,6 +34,25 @@ public static class MapDtoExtensions
     public static List<TeamsDto> ToDto(this List<Teams> teams)
     {
         return teams.Select(t => t.ToDto()).ToList();
+    }
+
+    public static TeamCharacterProfileDto ToDto(this TeamsCharacters teamCharacter)
+    {
+        if (teamCharacter == null)
+        {
+            return null;
+        }
+
+        return new TeamCharacterProfileDto
+        {
+            Id = teamCharacter.Id,
+            Email = teamCharacter.Email,
+            CharacterId = teamCharacter.CharacterId,
+            CharacterName = teamCharacter.Character.Name,
+            IsLeader = teamCharacter.IsLeader,
+            TeamId = teamCharacter.TeamId,
+            TeamName = teamCharacter.Team.Name
+        };
     }
 
     public static EvidencesDto ToDto(this Evidences evidence)
