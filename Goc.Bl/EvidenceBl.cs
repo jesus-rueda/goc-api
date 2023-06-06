@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Goc.Business.Contracts;
 using Goc.Business.Dtos;
 using Goc.Business.Extensions;
 using Goc.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Goc.Business;
 
@@ -37,7 +39,7 @@ public class EvidenceBl : IEvidenceBl
             throw new Exception("team not found");
         }
 
-        if (actionId == 1) // Attack
+        if (actionId == 2) // Attack
         {
             var affectedTeam = await _context.Teams.FindAsync(affectedTeamId);
             if (affectedTeam == null)
@@ -135,4 +137,19 @@ public class EvidenceBl : IEvidenceBl
 
         return coinks;
     }
+
+    //internal async Task<int> GetTeamMissionActions(int teamId, int missionId)
+    //{
+    //    var actionsCount = await _context.ActionsLog
+    //        .Include(a => a.Evidences)
+    //        .SelectMany(a => a.Evidences.)
+    //        .Where(a => a.TeamId == teamId && a.MissionId == missionId && a.Evidences.is)
+    //        .GroupBy(a => a.TeamCharacterId)
+    //        .CountAsync();
+    //    return actionsCount;
+    //}
+
+    //internal Task UpdateCoinksBalance(int teamId, int missionId)
+    //{
+    //}
 }
