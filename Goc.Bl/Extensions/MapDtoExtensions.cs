@@ -43,7 +43,7 @@ public static class MapDtoExtensions
 
     public static TeamCharacterProfileDto ToDto(this TeamsCharacters teamCharacter)
     {
-        if(teamCharacter == null)
+        if (teamCharacter == null)
         {
             return null;
         }
@@ -58,5 +58,22 @@ public static class MapDtoExtensions
             TeamId = teamCharacter.TeamId,
             TeamName = teamCharacter.Team.Name
         };
+    }
+
+    public static EvidencesDto ToDto(this Evidences evidence)
+    {
+        return new EvidencesDto
+        {
+            Id = evidence.Id,
+            ActionLogId = evidence.ActionLogId,
+            CharacterId = evidence.CharacterId,
+            Image = evidence.Image,
+            IsValid = evidence.IsValid,
+        };
+    }
+
+    public static List<EvidencesDto> ToDto(this List<Evidences> evidences)
+    {
+        return evidences.Select(t => t.ToDto()).ToList();
     }
 }
