@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Goc.Business;
 
 using System.Linq;
+using Goc.Business.Dtos;
 
 public class TeamBl : ITeamBl
 {
@@ -25,6 +26,21 @@ public class TeamBl : ITeamBl
             .FirstAsync(x => x.Id == id);
 
         return team;
+    }
+
+    public async Task<TeamMission> GetMissionProgressAsync(int missionId, int teamId)
+    {
+        var total = await this._context.TeamsCharacters.CountAsync(c => c.TeamId == teamId);
+
+        var actionsCount = await this._context.ActionsLog
+            .Include(a => a.Evidences)
+            .Where(a => a.TeamId == teamId && a.MissionId == missionId && a.Evidences.FirstOrDefault().IsValid)
+            .GroupBy(a => a.TeamCharacterId)
+            .CountAsync();
+
+        var progress = (100 * actionsCount) / total;
+
+        return new TeamMission { MissionCompleteness = progress };
     }
 
     public async Task<List<Teams>> GetAllAsync()
