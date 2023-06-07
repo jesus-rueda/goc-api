@@ -19,7 +19,7 @@ public class EvidenceBl : IEvidenceBl
 
     private readonly GocContext _context;
 
-    public EvidenceBl(GocContext context)
+    public EvidenceBl(GocContext context) // INotificationService
     {
         this._context = context;
     }
@@ -28,7 +28,7 @@ public class EvidenceBl : IEvidenceBl
     {
         //Validations
         var mission = await this.GetMission(missionId);
-        
+
         var team = await _context.Teams.FindAsync(teamId);
         if (team == null)
         {
@@ -86,6 +86,10 @@ public class EvidenceBl : IEvidenceBl
             };
 
             _context.Evidences.Add(evidence);
+
+            // Check if update team coinks balance is required.
+            await this.UpdateCoinksBalance(team, mission);
+
             rowAffected = await _context.SaveChangesAsync();
             if (rowAffected == 0) throw new Exception("The evidence could not be created");
 
@@ -134,15 +138,24 @@ public class EvidenceBl : IEvidenceBl
         return coinks;
     }
 
-    internal async Task UpdateCoinksBalance(int teamId, int missionId)
+    internal async Task UpdateCoinksBalance(Teams team, Missions mission)
     {
+        var teamCharactersCount = await _context.TeamsCharacters.Where(c => c.TeamId == team.Id).CountAsync();
+
         var actionsCount = await _context.ActionsLog
             .Include(a => a.Evidences)
-            .Where(a => a.TeamId == teamId && a.MissionId == missionId && a.Evidences.FirstOrDefault().IsValid)
+            .Where(a => a.TeamId == team.Id && a.MissionId == mission.Id && a.Evidences.FirstOrDefault().IsValid)
             .GroupBy(a => a.TeamCharacterId)
             .CountAsync();
+
+        if (actionsCount != teamCharactersCount - 1)
+        {
+            return;
+        }
+
+        team.Coinks += mission.Coinks;
     }
-    
+
     private async Task<Missions> GetMission(int missionId)
     {
         if (missionId <= 0)
