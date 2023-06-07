@@ -19,13 +19,13 @@ public class EvidenceBl : IEvidenceBl
     const int COINKS_BONNUS = 500;
 
     private readonly GocContext _context;
-    private readonly INotificationSerive _notificationService;
+    private readonly IMessageBl _messageBl;
 
 
-    public EvidenceBl(GocContext context, INotificationSerive notificationService)
+    public EvidenceBl(GocContext context, IMessageBl messageBl)
     {
         this._context = context;
-        this._notificationService = notificationService;
+        this._messageBl = messageBl;
     }
 
     public async Task<EvidencesDto> CreateAsync(int missionId, int teamId, int actionId, int teamCharacterId, int? affectedTeamId, string image)
@@ -60,8 +60,7 @@ public class EvidenceBl : IEvidenceBl
             if (isAffectedTeamDefended)
             {
                 var messageTemplate = await _context.MessageTemplates.FirstOrDefaultAsync(mt => mt.ActionTypeId == 3);
-                await _notificationService.Send(
-                    teamId,
+                await _messageBl.CreateAsync(
                     new MessagesDto
                     {
                         DateTime = DateTime.UtcNow,
@@ -76,8 +75,7 @@ public class EvidenceBl : IEvidenceBl
             {
                 var characterSkills = await _context.Characters.FirstOrDefaultAsync(c => c.Id == teamCharacter.CharacterId);
                 var messageTemplate = await _context.MessageTemplates.FirstOrDefaultAsync(mt => mt.ActionTypeId == 2);
-                await _notificationService.Send(
-                    teamId,
+                await _messageBl.CreateAsync(
                     new MessagesDto
                     {
                         DateTime = DateTime.UtcNow,
