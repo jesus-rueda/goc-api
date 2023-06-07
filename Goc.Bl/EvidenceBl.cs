@@ -57,16 +57,29 @@ public class EvidenceBl : IEvidenceBl
             var isAffectedTeamDefended =
                 await _context.ActionsLog.AnyAsync(a => a.MissionId == missionId && a.TeamId == affectedTeamId && a.ActionTypeId == 3);
 
-            if (!isAffectedTeamDefended)
+            if (isAffectedTeamDefended)
             {
-                var penalty = await _context.Characters.FirstOrDefaultAsync(c => c.Id == teamCharacter.CharacterId);
                 var messageTemplate = await _context.MessageTemplates.FirstOrDefaultAsync(mt => mt.ActionTypeId == 3);
                 await _notificationService.Send(
                     teamId,
                     new MessagesDto
                     {
                         DateTime = DateTime.UtcNow,
-                        Message = messageTemplate.Body.Replace("<attacker>", team.Name).Replace("<attackdescription>", penalty.Attack),
+                        Message = messageTemplate.Body.Replace("<attackedteam>", affectedTeam.Name),
+                        RecipientTeam = teamId,
+                        SenderTeam = affectedTeam.Id
+                    });
+            }
+            else
+            {
+                var characterSkills = await _context.Characters.FirstOrDefaultAsync(c => c.Id == teamCharacter.CharacterId);
+                var messageTemplate = await _context.MessageTemplates.FirstOrDefaultAsync(mt => mt.ActionTypeId == 2);
+                await _notificationService.Send(
+                    teamId,
+                    new MessagesDto
+                    {
+                        DateTime = DateTime.UtcNow,
+                        Message = messageTemplate.Body.Replace("<attacker>", team.Name).Replace("<attackdescription>", characterSkills.Attack),
                         RecipientTeam = affectedTeam.Id,
                         SenderTeam = teamId
                     });
