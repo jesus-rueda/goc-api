@@ -37,21 +37,26 @@ public class TeamsController : ControllerBase
             return NotFound();
         }
 
-        return team.ToDto();
+        return team;
     }
+
+
+
+    [HttpGet]
+    [Route("/members/{memberId}/stats")]
+    public async Task<ActionResult<TeamMemberStats>> GetTeamMember(int memberId)
+    {
+        return await this._teamBl.GetTeamMemberStatsAsync(memberId);
+    }
+
+
+
+
 
     [HttpGet]
     [Route("{teamId}/Mission/{missionId}")]
     public async Task<ActionResult<TeamMission>> GetMission(int teamId, int missionId)
     {
-
         return await this._teamBl.GetMissionProgressAsync(missionId, teamId);
-
-        //var teamMission = new TeamMission()
-        //{
-        //    MissionCompleteness = 80
-        //};
-
-        //return await Task.FromResult(teamMission);
     }
 }

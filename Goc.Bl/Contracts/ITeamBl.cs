@@ -10,8 +10,10 @@ namespace Goc.Business.Contracts
     {
         Task<List<Teams>> GetAllAsync();
 
-        Task<Teams> GetAsync(int id);
+        Task<TeamsDto> GetAsync(int id);
 
         Task<TeamMission> GetMissionProgressAsync(int missionId, int teamId);
+
+        Task<TeamMemberStats> GetTeamMemberStatsAsync(int memberId);
     }
 }

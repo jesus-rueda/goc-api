@@ -25,6 +25,7 @@ public class CharactersController : ControllerBase
         return characters == null ? NotFound() : characters;
     }
 
+
     [HttpGet]
     [Route("profile")]
     public async Task<ActionResult<TeamCharacterProfileDto>> GetProfile([FromHeader(Name="user-email")] string email)
