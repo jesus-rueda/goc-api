@@ -69,7 +69,7 @@ public class EvidenceBl : IEvidenceBl
                         SenderTeam = affectedTeam.Id
                     });
 
-                throw new Exception("Attack not effective");
+                throw new Exception("Attack not effective, this team has an active defense!");
             }
             else
             {
@@ -124,7 +124,7 @@ public class EvidenceBl : IEvidenceBl
             _context.Evidences.Add(evidence);
 
             // Check if update team coinks balance is required.
-            await this.UpdateCoinksBalance(team, mission);
+            await this.UpdateCoinksBalance(team, mission, affectedTeamId, actionId);
 
             rowAffected = await _context.SaveChangesAsync();
             if (rowAffected == 0) throw new Exception("The evidence could not be created");
@@ -174,7 +174,7 @@ public class EvidenceBl : IEvidenceBl
         return coinks;
     }
 
-    internal async Task UpdateCoinksBalance(Teams team, Missions mission)
+    internal async Task UpdateCoinksBalance(Teams team, Missions mission, int? affectedTeamId, int actionId)
     {
         var teamCharactersCount = await _context.TeamsCharacters.Where(c => c.TeamId == team.Id).CountAsync();
 
@@ -190,6 +190,15 @@ public class EvidenceBl : IEvidenceBl
         }
 
         team.Coinks += mission.Coinks;
+
+        if (actionId == 2) // Attack
+        {
+            var affectedTeam = await _context.Teams.FindAsync(affectedTeamId);
+            if (affectedTeam != null)
+            {
+                affectedTeam.Coinks -= mission.Coinks;
+            }
+        }
     }
 
     private async Task<Missions> GetMission(int missionId)
