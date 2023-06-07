@@ -55,7 +55,7 @@ public class EvidenceBl : IEvidenceBl
 
             // El equipo atacado tiene defensa?
             var isAffectedTeamDefended =
-                await _context.ActionsLog.AnyAsync(a => a.MissionId == missionId && a.TeamId == affectedTeamId && a.ActionTypeId == 3);
+                await _context.ActionsLog.AnyAsync(a => a.MissionId == mission.Id && a.TeamId == affectedTeamId && a.ActionTypeId == 3);
 
             if (isAffectedTeamDefended)
             {
