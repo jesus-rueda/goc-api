@@ -28,9 +28,9 @@ namespace Goc.Api.Controllers
         {
             var actionString = this.Request.Form["action"];
             var action = JsonConvert.DeserializeObject<ActionsLogDto>(actionString);
-            
+
             var imageBase64 = "";
-            if (formFile.Length > 0 && action.ActionTypeId != 2)
+            if (formFile != null && formFile.Length > 0 && action.ActionTypeId != 2)
             {
                 using (MemoryStream ms = new MemoryStream())
                 {

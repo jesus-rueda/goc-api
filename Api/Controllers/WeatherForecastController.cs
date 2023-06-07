@@ -8,6 +8,7 @@ namespace Goc.Api.Controllers
     using System.Linq;
     using System.Threading.Tasks;
     using Goc.Api;
+    using Goc.Business.Services;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.Logging;
 
@@ -21,12 +22,15 @@ namespace Goc.Api.Controllers
     };
 
         private readonly ILogger<WeatherForecastController> _logger;
-
+        private readonly INotificationSerive notificationSerive;
+        //private readonly IHubContext<NotificationHub> notificationHub;
         private readonly string myConnectionString;
 
-        public WeatherForecastController(ILogger<WeatherForecastController> logger, IConfiguration config)
+        public WeatherForecastController(ILogger<WeatherForecastController> logger, IConfiguration config, INotificationSerive notificationSerive)
         {
             _logger = logger;
+            this.notificationSerive = notificationSerive;
+            //this.notificationHub = notificationHub;
             myConnectionString = config.GetConnectionString("db");
         }
 
@@ -65,6 +69,15 @@ namespace Goc.Api.Controllers
         {
             Console.WriteLine("test post");
             return Task.CompletedTask;
+        }
+
+        [HttpGet]
+        [Route("/TestNotification")]
+        public async Task<IActionResult> TestNotification()
+        {
+            //await notificationHub.Clients.All.SendAsync("RecieveMessage", "Hola Mario");
+            await notificationSerive.Send(1, new Business.Dtos.MessagesDto() { Id = 1, SenderTeam = 1, RecipientTeam = 2, DateTime = DateTime.Now, Message = "Hola Mario" });
+            return Ok();
         }
     }
 
