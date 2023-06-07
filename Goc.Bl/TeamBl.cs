@@ -6,6 +6,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Goc.Business;
 
+using System.Linq;
+
 public class TeamBl : ITeamBl
 {
     private readonly GocContext _context;
@@ -17,7 +19,10 @@ public class TeamBl : ITeamBl
 
     public async Task<Teams> GetAsync(int id)
     {
-        var team = await _context.Teams.FindAsync(id);
+        var team = await _context.Teams
+            .Include(x => x.TeamsCharacters)
+            .ThenInclude(x=>x.Character)
+            .FirstAsync(x => x.Id == id);
 
         return team;
     }
