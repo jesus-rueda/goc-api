@@ -19,13 +19,13 @@ public class EvidenceBl : IEvidenceBl
     const int COINKS_BONNUS = 500;
 
     private readonly GocContext _context;
-    private readonly INotificationSerive _notificationService;
+    private readonly IMessageBl _messageBl;
 
 
-    public EvidenceBl(GocContext context, INotificationSerive notificationService)
+    public EvidenceBl(GocContext context, IMessageBl messageBl)
     {
         this._context = context;
-        this._notificationService = notificationService;
+        this._messageBl = messageBl;
     }
 
     public async Task<EvidencesDto> CreateAsync(int missionId, int teamId, int actionId, int teamCharacterId, int? affectedTeamId, string image)
@@ -60,8 +60,7 @@ public class EvidenceBl : IEvidenceBl
             if (isAffectedTeamDefended)
             {
                 var messageTemplate = await _context.MessageTemplates.FirstOrDefaultAsync(mt => mt.ActionTypeId == 3);
-                await _notificationService.Send(
-                    teamId,
+                await _messageBl.CreateAsync(
                     new MessagesDto
                     {
                         DateTime = DateTime.UtcNow,
@@ -70,14 +69,13 @@ public class EvidenceBl : IEvidenceBl
                         SenderTeam = affectedTeam.Id
                     });
 
-                throw new Exception("Attack not effective");
+                throw new Exception("Attack not effective, this team has an active defense!");
             }
             else
             {
                 var characterSkills = await _context.Characters.FirstOrDefaultAsync(c => c.Id == teamCharacter.CharacterId);
                 var messageTemplate = await _context.MessageTemplates.FirstOrDefaultAsync(mt => mt.ActionTypeId == 2);
-                await _notificationService.Send(
-                    teamId,
+                await _messageBl.CreateAsync(
                     new MessagesDto
                     {
                         DateTime = DateTime.UtcNow,
@@ -126,7 +124,7 @@ public class EvidenceBl : IEvidenceBl
             _context.Evidences.Add(evidence);
 
             // Check if update team coinks balance is required.
-            await this.UpdateCoinksBalance(team, mission);
+            await this.UpdateCoinksBalance(team, mission, affectedTeamId, actionId);
 
             rowAffected = await _context.SaveChangesAsync();
             if (rowAffected == 0) throw new Exception("The evidence could not be created");
@@ -176,7 +174,7 @@ public class EvidenceBl : IEvidenceBl
         return coinks;
     }
 
-    internal async Task UpdateCoinksBalance(Teams team, Missions mission)
+    internal async Task UpdateCoinksBalance(Teams team, Missions mission, int? affectedTeamId, int actionId)
     {
         var teamCharactersCount = await _context.TeamsCharacters.Where(c => c.TeamId == team.Id).CountAsync();
 
@@ -192,6 +190,15 @@ public class EvidenceBl : IEvidenceBl
         }
 
         team.Coinks += mission.Coinks;
+
+        if (actionId == 2) // Attack
+        {
+            var affectedTeam = await _context.Teams.FindAsync(affectedTeamId);
+            if (affectedTeam != null)
+            {
+                affectedTeam.Coinks -= mission.Coinks;
+            }
+        }
     }
 
     private async Task<Missions> GetMission(int missionId)

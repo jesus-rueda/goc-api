@@ -164,7 +164,7 @@ public partial class GocContext : DbContext
 
         modelBuilder.Entity<Messages>(entity =>
         {
-            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.Id).UseIdentityColumn();
 
             entity.Property(e => e.DateTime).HasColumnType("smalldatetime");
 
