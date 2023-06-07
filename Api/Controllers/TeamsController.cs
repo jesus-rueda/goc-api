@@ -43,7 +43,7 @@ public class TeamsController : ControllerBase
 
 
     [HttpGet]
-    [Route("/members/{memberId}/stats")]
+    [Route("members/{memberId}/stats")]
     public async Task<ActionResult<TeamMemberStats>> GetTeamMember(int memberId)
     {
         return await this._teamBl.GetTeamMemberStatsAsync(memberId);
