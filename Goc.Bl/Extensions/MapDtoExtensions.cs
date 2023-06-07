@@ -28,11 +28,13 @@ public static class MapDtoExtensions
 
     public static TeamsDto ToDto(this Teams teams)
     {
+        
         return new TeamsDto
         {
             Id = teams.Id,
             Name = teams.Name,
             Coinks = teams.Coinks,
+            Members  = teams.TeamsCharacters.Select(x=> x.ToDto()).AsEnumerable().ToArray()
         };
     }
 
@@ -53,10 +55,10 @@ public static class MapDtoExtensions
             Id = teamCharacter.Id,
             Email = teamCharacter.Email,
             CharacterId = teamCharacter.CharacterId,
-            CharacterName = teamCharacter.Character.Name,
+            CharacterName = teamCharacter.Character?.Name,
             IsLeader = teamCharacter.IsLeader,
             TeamId = teamCharacter.TeamId,
-            TeamName = teamCharacter.Team.Name
+            TeamName = teamCharacter.Team?.Name
         };
     }
 

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Goc.Business.Contracts;
 using Goc.Business.Dtos;
 using Goc.Business.Extensions;
+using Goc.Business.Services;
 using Goc.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,21 +19,30 @@ public class EvidenceBl : IEvidenceBl
     const int COINKS_BONNUS = 500;
 
     private readonly GocContext _context;
+    private readonly INotificationSerive _notificationService;
 
-    public EvidenceBl(GocContext context)
+
+    public EvidenceBl(GocContext context, INotificationSerive notificationService)
     {
         this._context = context;
+        this._notificationService = notificationService;
     }
 
     public async Task<EvidencesDto> CreateAsync(int missionId, int teamId, int actionId, int teamCharacterId, int? affectedTeamId, string image)
     {
         //Validations
         var mission = await this.GetMission(missionId);
-        
+
         var team = await _context.Teams.FindAsync(teamId);
         if (team == null)
         {
             throw new Exception("team not found");
+        }
+        
+        var teamCharacter = await _context.TeamsCharacters.FindAsync(teamCharacterId);
+        if (teamCharacter == null)
+        {
+            throw new Exception("Character not found");
         }
 
         if (actionId == 2) // Attack
@@ -42,12 +52,40 @@ public class EvidenceBl : IEvidenceBl
             {
                 throw new Exception("Affected team not found");
             }
-        }
 
-        var teamCharacter = await _context.TeamsCharacters.FindAsync(teamCharacterId);
-        if (teamCharacter == null)
-        {
-            throw new Exception("Character not found");
+            // El equipo atacado tiene defensa?
+            var isAffectedTeamDefended =
+                await _context.ActionsLog.AnyAsync(a => a.MissionId == missionId && a.TeamId == affectedTeamId && a.ActionTypeId == 3);
+
+            if (isAffectedTeamDefended)
+            {
+                var messageTemplate = await _context.MessageTemplates.FirstOrDefaultAsync(mt => mt.ActionTypeId == 3);
+                await _notificationService.Send(
+                    teamId,
+                    new MessagesDto
+                    {
+                        DateTime = DateTime.UtcNow,
+                        Message = messageTemplate.Body.Replace("<attackedteam>", affectedTeam.Name),
+                        RecipientTeam = teamId,
+                        SenderTeam = affectedTeam.Id
+                    });
+
+                throw new Exception("Attack not effective");
+            }
+            else
+            {
+                var characterSkills = await _context.Characters.FirstOrDefaultAsync(c => c.Id == teamCharacter.CharacterId);
+                var messageTemplate = await _context.MessageTemplates.FirstOrDefaultAsync(mt => mt.ActionTypeId == 2);
+                await _notificationService.Send(
+                    teamId,
+                    new MessagesDto
+                    {
+                        DateTime = DateTime.UtcNow,
+                        Message = messageTemplate.Body.Replace("<attacker>", team.Name).Replace("<attackdescription>", characterSkills.Attack),
+                        RecipientTeam = affectedTeam.Id,
+                        SenderTeam = teamId
+                    });
+            }
         }
 
         var action = await _context.ActionTypes.FindAsync(actionId);
@@ -86,6 +124,10 @@ public class EvidenceBl : IEvidenceBl
             };
 
             _context.Evidences.Add(evidence);
+
+            // Check if update team coinks balance is required.
+            await this.UpdateCoinksBalance(team, mission);
+
             rowAffected = await _context.SaveChangesAsync();
             if (rowAffected == 0) throw new Exception("The evidence could not be created");
 
@@ -134,15 +176,24 @@ public class EvidenceBl : IEvidenceBl
         return coinks;
     }
 
-    internal async Task UpdateCoinksBalance(int teamId, int missionId)
+    internal async Task UpdateCoinksBalance(Teams team, Missions mission)
     {
+        var teamCharactersCount = await _context.TeamsCharacters.Where(c => c.TeamId == team.Id).CountAsync();
+
         var actionsCount = await _context.ActionsLog
             .Include(a => a.Evidences)
-            .Where(a => a.TeamId == teamId && a.MissionId == missionId && a.Evidences.FirstOrDefault().IsValid)
+            .Where(a => a.TeamId == team.Id && a.MissionId == mission.Id && a.Evidences.FirstOrDefault().IsValid)
             .GroupBy(a => a.TeamCharacterId)
             .CountAsync();
+
+        if (actionsCount != teamCharactersCount - 1)
+        {
+            return;
+        }
+
+        team.Coinks += mission.Coinks;
     }
-    
+
     private async Task<Missions> GetMission(int missionId)
     {
         if (missionId <= 0)

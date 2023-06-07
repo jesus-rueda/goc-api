@@ -42,13 +42,16 @@ public class TeamsController : ControllerBase
 
     [HttpGet]
     [Route("{teamId}/Mission/{missionId}")]
-    public async Task<ActionResult<TeamMission>> GetMissions(int teamId, int missionId)
+    public async Task<ActionResult<TeamMission>> GetMission(int teamId, int missionId)
     {
-        var teamMission = new TeamMission()
-        {
-            MissionCompleteness = 80
-        };
 
-        return await Task.FromResult(teamMission);
+        return await this._teamBl.GetMissionProgressAsync(missionId, teamId);
+
+        //var teamMission = new TeamMission()
+        //{
+        //    MissionCompleteness = 80
+        //};
+
+        //return await Task.FromResult(teamMission);
     }
 }
