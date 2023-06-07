@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Goc.Business.Contracts;
 using Goc.Business.Dtos;
 using Goc.Business.Extensions;
+using Goc.Business.Services;
 using Goc.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,10 +19,13 @@ public class EvidenceBl : IEvidenceBl
     const int COINKS_BONNUS = 500;
 
     private readonly GocContext _context;
+    private readonly INotificationSerive _notificationService;
 
-    public EvidenceBl(GocContext context) // INotificationService
+
+    public EvidenceBl(GocContext context, INotificationSerive notificationService)
     {
         this._context = context;
+        this._notificationService = notificationService;
     }
 
     public async Task<EvidencesDto> CreateAsync(int missionId, int teamId, int actionId, int teamCharacterId, int? affectedTeamId, string image)
@@ -34,6 +38,12 @@ public class EvidenceBl : IEvidenceBl
         {
             throw new Exception("team not found");
         }
+        
+        var teamCharacter = await _context.TeamsCharacters.FindAsync(teamCharacterId);
+        if (teamCharacter == null)
+        {
+            throw new Exception("Character not found");
+        }
 
         if (actionId == 2) // Attack
         {
@@ -42,12 +52,25 @@ public class EvidenceBl : IEvidenceBl
             {
                 throw new Exception("Affected team not found");
             }
-        }
 
-        var teamCharacter = await _context.TeamsCharacters.FindAsync(teamCharacterId);
-        if (teamCharacter == null)
-        {
-            throw new Exception("Character not found");
+            // El equipo atacado tiene defensa?
+            var isAffectedTeamDefended =
+                await _context.ActionsLog.AnyAsync(a => a.MissionId == missionId && a.TeamId == affectedTeamId && a.ActionTypeId == 3);
+
+            if (!isAffectedTeamDefended)
+            {
+                var penalty = await _context.Characters.FirstOrDefaultAsync(c => c.Id == teamCharacter.CharacterId);
+                var messageTemplate = await _context.MessageTemplates.FirstOrDefaultAsync(mt => mt.ActionTypeId == 3);
+                await _notificationService.Send(
+                    teamId,
+                    new MessagesDto
+                    {
+                        DateTime = DateTime.UtcNow,
+                        Message = messageTemplate.Body.Replace("<attacker>", team.Name).Replace("<attackdescription>", penalty.Attack),
+                        RecipientTeam = affectedTeam.Id,
+                        SenderTeam = teamId
+                    });
+            }
         }
 
         var action = await _context.ActionTypes.FindAsync(actionId);
