@@ -69,6 +69,8 @@ public class EvidenceBl : IEvidenceBl
                         RecipientTeam = teamId,
                         SenderTeam = affectedTeam.Id
                     });
+
+                throw new Exception("Attack not effective");
             }
             else
             {
