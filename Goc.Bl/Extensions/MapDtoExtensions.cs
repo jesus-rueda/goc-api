@@ -93,4 +93,16 @@ public static class MapDtoExtensions
     {
         return messages.Select(m => m.ToDto()).ToList();
     }
+
+    public static Messages ToEntity(this MessagesDto message)
+    {
+        return new Messages
+        {
+            Id = message.Id,
+            SenderTeam = message.SenderTeam,
+            RecipientTeam = message.RecipientTeam,
+            Message = message.Message,
+            DateTime = message.DateTime,
+        };
+    }
 }

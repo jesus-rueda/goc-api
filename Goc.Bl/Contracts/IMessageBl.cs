@@ -8,5 +8,7 @@ namespace Goc.Business.Contracts
     public interface IMessageBl
     {
         Task<List<MessagesDto>> GetAsync(int teamId, DateTime date);
+
+        Task<MessagesDto> CreateAsync(MessagesDto message);
     }
 }

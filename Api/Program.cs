@@ -15,7 +15,7 @@ builder.Services.AddSignalR();
 builder.Services.AddCors(options => options.AddPolicy("CorsPolicy",
         builder =>
         {
-            builder.AllowAnyOrigin()
+            builder.WithOrigins("http://localhost:4200", "https://purple-cliff-03edabc0f.3.azurestaticapps.net")
                    .AllowAnyHeader()
                    .AllowAnyMethod();
         }));
