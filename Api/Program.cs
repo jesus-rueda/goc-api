@@ -1,7 +1,11 @@
+using System;
 using Goc.Business;
 using Goc.Business.Hubs;
 using Goc.Models;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.CookiePolicy;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -30,6 +34,24 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(
+    options =>
+    {
+        options.Cookie.SameSite = SameSiteMode.None;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        //options.Cookie.HttpOnly = false;
+        //options.Cookie.SecurePolicy = CookieSecurePolicy.None;
+        options.ExpireTimeSpan = TimeSpan.FromDays(1);
+        options.SlidingExpiration = true;
+    });
+
+//builder.Services.ConfigureApplicationCookie(
+//    options =>
+//    {
+//        options.Cookie.SameSite = SameSiteMode.None;
+//    });
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -43,6 +65,15 @@ app.UseCors("CorsPolicy");
 
 app.UseHttpsRedirection();
 
+app.UseCookiePolicy(new CookiePolicyOptions()
+                    {
+                        //HttpOnly = HttpOnlyPolicy.Always,
+                        //Secure = CookieSecurePolicy.Always,
+                        MinimumSameSitePolicy = SameSiteMode.None
+                    });
+
+
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

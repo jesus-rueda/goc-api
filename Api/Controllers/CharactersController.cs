@@ -6,7 +6,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Goc.Api.Controllers;
 
+using Microsoft.AspNetCore.Authorization;
+
 [ApiController]
+[Authorize]
 [Route("api/[controller]")]
 public class CharactersController : ControllerBase
 {
@@ -28,9 +31,10 @@ public class CharactersController : ControllerBase
 
     [HttpGet]
     [Route("profile")]
-    public async Task<ActionResult<TeamCharacterProfileDto>> GetProfile([FromHeader(Name="user-email")] string email)
+    public async Task<ActionResult<TeamCharacterProfileDto>> GetProfile()
     {
-        var teamCharacter = await _characterBl.GetProfile(email);
+        var userId = this.User.Identity.Name;
+        var teamCharacter = await _characterBl.GetProfile(userId);
         return teamCharacter == null ? NotFound() : teamCharacter;
     }
 }
