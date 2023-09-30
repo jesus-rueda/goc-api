@@ -14,6 +14,6 @@ namespace Goc.Models
         public bool IsValid { get; set; }
 
         public virtual ActionsLog ActionLog { get; set; }
-        public virtual TeamsCharacters TeamCharacter { get; set; }
+        public virtual User TeamCharacter { get; set; }
     }
 }

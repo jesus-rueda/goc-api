@@ -20,18 +20,18 @@ public class CharacterBl : ICharacterBl
 
     public async Task<Characters?> Get(int id)
     {
-        var character = await _context.Characters.FindAsync(id);
+        var character = await this._context.Characters.FindAsync(id);
         return character;
     }
 
-    public async Task<TeamCharacterProfileDto> GetProfile(string email)
-    {
-        var teamCharacterProfile = await _context.TeamsCharacters
-            .Where(c => c.Email == email)
-            .Include(c => c.Team)
-            .Include(c => c.Character)
-            .FirstOrDefaultAsync();
+    //public async Task<TeamCharacterProfileDto> GetProfile(string email)
+    //{
+    //    var teamCharacterProfile = await _context.Users
+    //        .Where(c => c.Upn == email)
+    //        .Include(c => c.Team)
+    //        .Include(c => c.Character)
+    //        .FirstOrDefaultAsync();
 
-        return teamCharacterProfile.ToDto();
-    }
+    //    return teamCharacterProfile.ToDto();
+    //}
 }

@@ -8,5 +8,5 @@ public interface ICharacterBl
 {
     Task<Characters?> Get(int id);
 
-    Task<TeamCharacterProfileDto?> GetProfile(string email);
+    //Task<TeamCharacterProfileDto?> GetProfile(string email);
 }

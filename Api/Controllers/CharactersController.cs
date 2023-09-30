@@ -29,12 +29,12 @@ public class CharactersController : ControllerBase
     }
 
 
-    [HttpGet]
-    [Route("profile")]
-    public async Task<ActionResult<TeamCharacterProfileDto>> GetProfile()
-    {
-        var userId = this.User.Identity.Name;
-        var teamCharacter = await _characterBl.GetProfile(userId);
-        return teamCharacter == null ? NotFound() : teamCharacter;
-    }
+    //[HttpGet]
+    //[Route("profile")]
+    //public async Task<ActionResult<TeamCharacterProfileDto>> GetProfile()
+    //{
+    //    var userId = this.User.Identity.Name;
+    //    var teamCharacter = await _characterBl.GetProfile(userId);
+    //    return teamCharacter == null ? NotFound() : teamCharacter;
+    //}
 }

@@ -11,7 +11,7 @@ namespace Goc.Models
         {
             //ActionsLog = new HashSet<ActionsLog>();
             //Evidences = new HashSet<Evidences>();
-            TeamsCharacters = new HashSet<TeamsCharacters>();
+            TeamsCharacters = new HashSet<User>();
         }
 
         public int Id { get; set; }
@@ -23,6 +23,6 @@ namespace Goc.Models
 
         //public virtual ICollection<ActionsLog> ActionsLog { get; set; }
         //public virtual ICollection<Evidences> Evidences { get; set; }
-        public virtual ICollection<TeamsCharacters> TeamsCharacters { get; set; }
+        public virtual ICollection<User> TeamsCharacters { get; set; }
     }
 }

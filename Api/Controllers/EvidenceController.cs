@@ -10,7 +10,10 @@ using Newtonsoft.Json;
 
 namespace Goc.Api.Controllers
 {
+    using Microsoft.AspNetCore.Authorization;
+
     [ApiController]
+    [Authorize]
     [Route("api/[controller]")]
     public class EvidenceController : ControllerBase
     {

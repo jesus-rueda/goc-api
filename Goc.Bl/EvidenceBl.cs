@@ -39,7 +39,7 @@ public class EvidenceBl : IEvidenceBl
             throw new Exception("team not found");
         }
         
-        var teamCharacter = await _context.TeamsCharacters.FindAsync(teamCharacterId);
+        var teamCharacter = await _context.Users.FindAsync(teamCharacterId);
         if (teamCharacter == null)
         {
             throw new Exception("Character not found");
@@ -176,7 +176,7 @@ public class EvidenceBl : IEvidenceBl
 
     internal async Task UpdateCoinksBalance(Teams team, Missions mission, int? affectedTeamId, int actionId)
     {
-        var teamCharactersCount = await _context.TeamsCharacters.Where(c => c.TeamId == team.Id).CountAsync();
+        var teamCharactersCount = await _context.Users.Where(c => c.TeamId == team.Id).CountAsync();
 
         var actionsCount = await _context.ActionsLog
             .Include(a => a.Evidences)

@@ -6,7 +6,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Goc.Api.Controllers;
 
+using Microsoft.AspNetCore.Authorization;
+
 [ApiController]
+[Authorize]
 [Route("api/[controller]")]
 public class MissionsController
 {

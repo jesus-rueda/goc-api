@@ -12,7 +12,7 @@ namespace Goc.Models
             ActionsLog = new HashSet<ActionsLog>();
             MessagesRecipientTeamNavigation = new HashSet<Messages>();
             MessagesSenderTeamNavigation = new HashSet<Messages>();
-            TeamsCharacters = new HashSet<TeamsCharacters>();
+            TeamsCharacters = new HashSet<User>();
         }
 
         public int Id { get; set; }
@@ -22,6 +22,6 @@ namespace Goc.Models
         public virtual ICollection<ActionsLog> ActionsLog { get; set; }
         public virtual ICollection<Messages> MessagesRecipientTeamNavigation { get; set; }
         public virtual ICollection<Messages> MessagesSenderTeamNavigation { get; set; }
-        public virtual ICollection<TeamsCharacters> TeamsCharacters { get; set; }
+        public virtual ICollection<User> TeamsCharacters { get; set; }
     }
 }

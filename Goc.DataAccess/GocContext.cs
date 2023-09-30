@@ -26,7 +26,8 @@ public partial class GocContext : DbContext
     public virtual DbSet<Messages> Messages { get; set; }
     public virtual DbSet<Missions> Missions { get; set; }
     public virtual DbSet<Teams> Teams { get; set; }
-    public virtual DbSet<TeamsCharacters> TeamsCharacters { get; set; }
+    
+    public virtual DbSet<User> Users { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -215,9 +216,9 @@ public partial class GocContext : DbContext
                 .HasMaxLength(50);
         });
 
-        modelBuilder.Entity<TeamsCharacters>(entity =>
+        modelBuilder.Entity<User>(entity =>
         {
-            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.Id).UseIdentityColumn();
 
             entity.HasOne(d => d.Character)
                 .WithMany(p => p.TeamsCharacters)

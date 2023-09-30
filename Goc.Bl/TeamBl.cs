@@ -30,7 +30,7 @@ public class TeamBl : ITeamBl
 
         var dto = team.ToDto();
 
-        var teamMembersCount = await this._context.TeamsCharacters.CountAsync(x => x.TeamId == id);
+        var teamMembersCount = await this._context.Users.CountAsync(x => x.TeamId == id);
         dto.AttacksDone = await this._context.ActionsLog.CountAsync(x=>x.TeamId == id && x.ActionTypeId == 2);
         dto.AttacksTotal = teamMembersCount * 5;
         dto.DefensesTotal = teamMembersCount * 5;
@@ -41,7 +41,7 @@ public class TeamBl : ITeamBl
 
     public async Task<TeamMission> GetMissionProgressAsync(int missionId, int teamId)
     {
-        var total = await this._context.TeamsCharacters.CountAsync(c => c.TeamId == teamId);
+        var total = await this._context.Users.CountAsync(c => c.TeamId == teamId);
 
         var actionsCount = await this._context.ActionsLog
             .Include(a => a.Evidences)

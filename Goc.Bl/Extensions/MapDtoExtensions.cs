@@ -43,7 +43,7 @@ public static class MapDtoExtensions
         return teams.Select(t => t.ToDto()).ToList();
     }
 
-    public static TeamCharacterProfileDto ToDto(this TeamsCharacters teamCharacter)
+    public static TeamCharacterProfileDto ToDto(this User teamCharacter)
     {
         if (teamCharacter == null)
         {
@@ -53,11 +53,11 @@ public static class MapDtoExtensions
         return new TeamCharacterProfileDto
         {
             Id = teamCharacter.Id,
-            Email = teamCharacter.Email,
-            CharacterId = teamCharacter.CharacterId,
+            Email = teamCharacter.Upn,
+            CharacterId = teamCharacter.CharacterId??0,
             CharacterName = teamCharacter.Character?.Name,
-            IsLeader = teamCharacter.IsLeader,
-            TeamId = teamCharacter.TeamId,
+            IsLeader = teamCharacter.IsLeader ? 1 : 0,
+            TeamId = teamCharacter.TeamId ?? 0,
             TeamName = teamCharacter.Team?.Name
         };
     }
