@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Goc.Business;
@@ -45,28 +46,33 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(
-    options =>
+options =>
+{
+    options.Events.OnValidatePrincipal = async context =>
     {
-        options.Events.OnValidatePrincipal = async context =>
+        if (authValidator != null)
         {
-            if (authValidator != null)
-            {
-                await authValidator(context);
-            }
-        };
-        options.Cookie.SameSite = SameSiteMode.None;
-        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-        //options.Cookie.HttpOnly = false;
-        //options.Cookie.SecurePolicy = CookieSecurePolicy.None;
-        options.ExpireTimeSpan = TimeSpan.FromDays(1);
-        options.SlidingExpiration = true;
-    });
+            await authValidator(context);
+        }
+    };
+    options.Cookie.SameSite = SameSiteMode.None;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
 
-//builder.Services.ConfigureApplicationCookie(
-//    options =>
-//    {
-//        options.Cookie.SameSite = SameSiteMode.None;
-//    });
+    options.Events.OnRedirectToAccessDenied = options.Events.OnRedirectToLogin = context =>
+    {
+        context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+        return Task.CompletedTask;
+    };
+
+    options.Events.OnSigningOut = context =>
+    {
+        context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+        return Task.CompletedTask;
+    };
+
+    options.ExpireTimeSpan = TimeSpan.FromDays(1);
+    options.SlidingExpiration = true;
+});
 
 var app = builder.Build();
 
