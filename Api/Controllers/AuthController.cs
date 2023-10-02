@@ -50,6 +50,14 @@ public class AuthController : ControllerBase
     }
     #region Methods
 
+    [HttpDelete]    
+    public async Task<ActionResult> logOut()
+    {
+        await this.HttpContext.SignOutAsync();
+        return this.Ok();
+    }
+    
+
     [HttpPost]
     [Route("{challengeId}")]
     public async Task<LoginResponse> logIn(Guid challengeId)
