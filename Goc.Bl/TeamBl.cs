@@ -80,12 +80,13 @@ public class TeamBl : ITeamBl
     public async Task RequestJoin(int userId, int teamId, int characterId)
     {
         //TODO: validate user not have a team already
-        var team = new User { Id = userId, TeamId = teamId, CharacterId = characterId, PendingAproval = true };
+        var team = new User { Id = userId, TeamId = teamId, CharacterId = characterId, PendingAproval = true, IsLeader = false };
        this._context.Users.Attach(team);        
         //Mark only selected attributes as modified
         this._context.Entry(team).Property(x => x.TeamId).IsModified = true;
         this._context.Entry(team).Property(x => x.CharacterId).IsModified = true;
         this._context.Entry(team).Property(x => x.PendingAproval).IsModified = true;
+        this._context.Entry(team).Property(x => x.IsLeader).IsModified = true;
 
         await this._context.SaveChangesAsync();
     }
@@ -146,12 +147,11 @@ public class TeamBl : ITeamBl
     public async Task MakeLeader(int teamId, int userId)
     {
         await _context.Database.ExecuteSqlRawAsync("UPDATE Users SET IsLeader = 0 WHERE TeamId = {0}", teamId);
-        await _context.Database.ExecuteSqlRawAsync("UPDATE Users SET IsLeader = 1 WHERE TeamId = {0} AND Id = {1}", teamId, userId);
+        await _context.Database.ExecuteSqlRawAsync("UPDATE Users SET IsLeader = 1, PendingAproval = 0 WHERE TeamId = {0} AND Id = {1}", teamId, userId);
     }
 
     public async Task Delete(int teamId)
     {
-        this._context.Remove(new Team() { Id = teamId });
-        await this._context.SaveChangesAsync();
+        await _context.Database.ExecuteSqlRawAsync("DELETE FROM dbo.Teams WHERE Id = {0}", teamId);        
     }
 }
