@@ -25,6 +25,9 @@ public class TeamsController : ControllerBase
         _teamBl = teamsBl;
     }
 
+
+
+
     [HttpGet]
     [Route("")]
     public async Task<ActionResult<List<TeamDto>>> GetAllTeams()
@@ -147,6 +150,13 @@ public class TeamsController : ControllerBase
 
 
 
+    [HttpDelete]
+    [Route("{teamId}")]
+    [Authorize(Roles = "admin")]
+    public async Task Delete(int teamId)
+    {
+        await this._teamBl.Delete(teamId);
+    }
 
 
     [HttpGet]

@@ -24,5 +24,6 @@ namespace Goc.Business.Contracts
         Task<TeamDto> Create(string teamName, byte[] image, int? leaderId);
         Task<byte[]> GetImage(int teamId);
         Task MakeLeader(int teamId, int userId);
+        Task Delete(int teamId);
     }
 }

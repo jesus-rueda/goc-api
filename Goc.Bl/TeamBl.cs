@@ -148,4 +148,10 @@ public class TeamBl : ITeamBl
         await _context.Database.ExecuteSqlRawAsync("UPDATE Users SET IsLeader = 0 WHERE TeamId = {0}", teamId);
         await _context.Database.ExecuteSqlRawAsync("UPDATE Users SET IsLeader = 1 WHERE TeamId = {0} AND Id = {1}", teamId, userId);
     }
+
+    public async Task Delete(int teamId)
+    {
+        this._context.Remove(new Team() { Id = teamId });
+        await this._context.SaveChangesAsync();
+    }
 }
