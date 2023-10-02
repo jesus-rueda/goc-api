@@ -20,12 +20,12 @@ public partial class GocContext : DbContext
     public virtual DbSet<ActionTypes> ActionTypes { get; set; }
     public virtual DbSet<ActionsLog> ActionsLog { get; set; }
     public virtual DbSet<Campaigns> Campaigns { get; set; }
-    public virtual DbSet<Characters> Characters { get; set; }
+    public virtual DbSet<Character> Characters { get; set; }
     public virtual DbSet<Evidences> Evidences { get; set; }
     public virtual DbSet<MessageTemplates> MessageTemplates { get; set; }
     public virtual DbSet<Messages> Messages { get; set; }
     public virtual DbSet<Missions> Missions { get; set; }
-    public virtual DbSet<Teams> Teams { get; set; }
+    public virtual DbSet<Team> Teams { get; set; }
     
     public virtual DbSet<User> Users { get; set; }
 
@@ -98,7 +98,7 @@ public partial class GocContext : DbContext
                     });
         });
 
-        modelBuilder.Entity<Characters>(entity =>
+        modelBuilder.Entity<Character>(entity =>
         {
             entity.Property(e => e.Id).ValueGeneratedNever();
 
@@ -207,9 +207,9 @@ public partial class GocContext : DbContext
             entity.Property(e => e.StartDate).HasColumnType("smalldatetime");
         });
 
-        modelBuilder.Entity<Teams>(entity =>
+        modelBuilder.Entity<Team>(entity =>
         {
-            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.Id).UseIdentityColumn();
 
             entity.Property(e => e.Name)
                 .IsRequired()

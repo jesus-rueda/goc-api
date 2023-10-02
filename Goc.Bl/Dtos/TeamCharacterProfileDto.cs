@@ -7,6 +7,8 @@ public class TeamCharacterProfileDto
     public string TeamName { get; set; }
     public int CharacterId { get; set; }
     public string CharacterName { get; set; }
-    public string Email { get; set; }
+    public string Upn { get; set; }
     public int IsLeader { get; set; }
+
+    public bool IsPendingAproval { get; set; }
 }

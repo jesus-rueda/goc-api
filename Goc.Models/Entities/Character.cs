@@ -2,12 +2,13 @@
 #nullable disable
 using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace Goc.Models
 {
-    public partial class Characters
+    public partial class Character
     {
-        public Characters()
+        public Character()
         {
             //ActionsLog = new HashSet<ActionsLog>();
             //Evidences = new HashSet<Evidences>();
@@ -23,6 +24,7 @@ namespace Goc.Models
 
         //public virtual ICollection<ActionsLog> ActionsLog { get; set; }
         //public virtual ICollection<Evidences> Evidences { get; set; }
+        [JsonIgnore]
         public virtual ICollection<User> TeamsCharacters { get; set; }
     }
 }

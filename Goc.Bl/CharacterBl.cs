@@ -6,6 +6,7 @@ using Goc.Business.Dtos;
 using Goc.Models;
 using Microsoft.EntityFrameworkCore;
 using Goc.Business.Extensions;
+using System.Collections.Generic;
 
 namespace Goc.Business;
 
@@ -18,10 +19,20 @@ public class CharacterBl : ICharacterBl
         _context = context;
     }
 
-    public async Task<Characters?> Get(int id)
+    public async Task<Character?> Get(int id)
     {
         var character = await this._context.Characters.FindAsync(id);
         return character;
+    }
+
+    public async Task<IEnumerable<Character>> GetAll()
+    {
+        return this._context.Characters.AsNoTracking();
+    }
+
+    public byte[] GetImage(int characterId, string type)
+    {
+        throw new NotImplementedException("GetImage not implemented"); 
     }
 
     //public async Task<TeamCharacterProfileDto> GetProfile(string email)

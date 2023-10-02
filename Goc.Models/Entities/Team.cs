@@ -5,9 +5,9 @@ using System.Collections.Generic;
 
 namespace Goc.Models
 {
-    public partial class Teams
+    public partial class Team
     {
-        public Teams()
+        public Team()
         {
             ActionsLog = new HashSet<ActionsLog>();
             MessagesRecipientTeamNavigation = new HashSet<Messages>();
@@ -18,6 +18,9 @@ namespace Goc.Models
         public int Id { get; set; }
         public string Name { get; set; }
         public int Coinks { get; set; }
+
+        //TODO: Avoid load the image in all the queries
+        public byte[]? Image { get; set; }
 
         public virtual ICollection<ActionsLog> ActionsLog { get; set; }
         public virtual ICollection<Messages> MessagesRecipientTeamNavigation { get; set; }

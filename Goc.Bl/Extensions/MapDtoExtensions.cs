@@ -26,10 +26,10 @@ public static class MapDtoExtensions
         return mission.Select(m => m.ToDto()).ToList();
     }
 
-    public static TeamsDto ToDto(this Teams teams)
+    public static TeamDto ToDto(this Team teams)
     {
         
-        return new TeamsDto
+        return new TeamDto
         {
             Id = teams.Id,
             Name = teams.Name,
@@ -38,7 +38,7 @@ public static class MapDtoExtensions
         };
     }
 
-    public static List<TeamsDto> ToDto(this List<Teams> teams)
+    public static List<TeamDto> ToDto(this List<Team> teams)
     {
         return teams.Select(t => t.ToDto()).ToList();
     }
@@ -53,12 +53,13 @@ public static class MapDtoExtensions
         return new TeamCharacterProfileDto
         {
             Id = teamCharacter.Id,
-            Email = teamCharacter.Upn,
+            Upn = teamCharacter.Upn,
             CharacterId = teamCharacter.CharacterId??0,
             CharacterName = teamCharacter.Character?.Name,
             IsLeader = teamCharacter.IsLeader ? 1 : 0,
             TeamId = teamCharacter.TeamId ?? 0,
-            TeamName = teamCharacter.Team?.Name
+            TeamName = teamCharacter.Team?.Name,
+            IsPendingAproval = teamCharacter.PendingAproval
         };
     }
 

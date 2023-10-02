@@ -174,7 +174,7 @@ public class EvidenceBl : IEvidenceBl
         return coinks;
     }
 
-    internal async Task UpdateCoinksBalance(Teams team, Missions mission, int? affectedTeamId, int actionId)
+    internal async Task UpdateCoinksBalance(Team team, Missions mission, int? affectedTeamId, int actionId)
     {
         var teamCharactersCount = await _context.Users.Where(c => c.TeamId == team.Id).CountAsync();
 

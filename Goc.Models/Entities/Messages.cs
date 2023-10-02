@@ -10,6 +10,6 @@ public partial class Messages
     public string Message { get; set; }
     public DateTime DateTime { get; set; }
 
-    public virtual Teams RecipientTeamNavigation { get; set; }
-    public virtual Teams SenderTeamNavigation { get; set; }
+    public virtual Team RecipientTeamNavigation { get; set; }
+    public virtual Team SenderTeamNavigation { get; set; }
 }

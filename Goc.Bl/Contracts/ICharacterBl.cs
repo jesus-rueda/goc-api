@@ -1,12 +1,15 @@
-﻿using System.Threading.Tasks;
-using Goc.Business.Dtos;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Goc.Models;
 
 namespace Goc.Business.Contracts;
 
 public interface ICharacterBl
 {
-    Task<Characters?> Get(int id);
+    Task<Character?> Get(int id);
+
+    Task<IEnumerable<Character>> GetAll();
+    byte[] GetImage(int characterId, string type);
 
     //Task<TeamCharacterProfileDto?> GetProfile(string email);
 }

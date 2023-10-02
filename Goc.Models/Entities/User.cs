@@ -23,17 +23,18 @@ namespace Goc.Models
         public int? CharacterId { get; set; }
         public string Upn { get; set; }
         public bool IsLeader { get; set; }
-
         public bool IsAdmin { get; set; }
+
+        public bool PendingAproval { get; set; }
 
         [JsonIgnore]
         public virtual ICollection<ActionsLog> ActionsLog { get; set; }
         [JsonIgnore]
         public virtual ICollection<Evidences> Evidences { get; set; }
         [JsonIgnore]
-        public virtual Characters? Character { get; set; }
+        public virtual Character? Character { get; set; }
         [JsonIgnore]
-        public virtual Teams? Team { get; set; }
+        public virtual Team? Team { get; set; }
     }
 
     public interface IUser

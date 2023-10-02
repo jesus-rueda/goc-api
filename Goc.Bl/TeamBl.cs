@@ -10,7 +10,7 @@ using System;
 using System.Linq;
 using Goc.Business.Dtos;
 using Goc.Business.Extensions;
-using Microsoft.EntityFrameworkCore.Query.Internal;
+
 
 public class TeamBl : ITeamBl
 {
@@ -21,7 +21,7 @@ public class TeamBl : ITeamBl
         _context = context;
     }
 
-    public async Task<TeamsDto> GetAsync(int id)
+    public async Task<TeamDto> GetAsync(int id)
     {
         var team = await _context.Teams
             .Include(x => x.TeamsCharacters)
@@ -30,7 +30,8 @@ public class TeamBl : ITeamBl
 
         var dto = team.ToDto();
 
-        var teamMembersCount = await this._context.Users.CountAsync(x => x.TeamId == id);
+        var teamMembersCount = await this._context.Users.CountAsync(x => x.TeamId == id && !x.PendingAproval);
+
         dto.AttacksDone = await this._context.ActionsLog.CountAsync(x=>x.TeamId == id && x.ActionTypeId == 2);
         dto.AttacksTotal = teamMembersCount * 5;
         dto.DefensesTotal = teamMembersCount * 5;
@@ -70,9 +71,81 @@ public class TeamBl : ITeamBl
                };
     }
 
-    public async Task<List<Teams>> GetAllAsync()
+    public async Task<List<TeamDto>> GetAllAsync()
     {
         var teams = await _context.Teams.ToListAsync();
-        return teams;
+        return teams.Select(x => x.ToDto()).ToList();
+    }
+
+    public async Task RequestJoin(int userId, int teamId, int characterId)
+    {
+        //TODO: validate user not have a team already
+        var team = new User { Id = userId, TeamId = teamId, CharacterId = characterId, PendingAproval = true };
+       this._context.Users.Attach(team);        
+        //Mark only selected attributes as modified
+        this._context.Entry(team).Property(x => x.TeamId).IsModified = true;
+        this._context.Entry(team).Property(x => x.CharacterId).IsModified = true;
+        this._context.Entry(team).Property(x => x.PendingAproval).IsModified = true;
+
+        await this._context.SaveChangesAsync();
+    }
+
+    public async Task<List<User>> GetPendingJoinAprovals(int teamId)
+    {
+        return await this._context.Users.Where(x => x.TeamId == teamId && x.PendingAproval).ToListAsync();
+    }
+
+    public async Task AproveJoinRequest(int teamId, int userId, bool aprove)
+    {
+        var user = new User
+        {
+            Id = userId,
+            TeamId = aprove ? teamId : null,          
+        };
+
+        if (!aprove)
+        {
+            user.CharacterId = null;
+            user.TeamId = null;            
+        }
+
+        user.PendingAproval = false;
+        this._context.Users.Attach(user);
+
+        this._context.Entry(user).Property(x => x.TeamId).IsModified = true;
+        this._context.Entry(user).Property(x => x.PendingAproval).IsModified = true;
+        if (!aprove)
+        {
+            this._context.Entry(user).Property(x => x.CharacterId).IsModified = true;
+        }
+
+        await this._context.SaveChangesAsync();
+    }
+
+    public async Task<TeamDto> Create(string teamName, byte[] image, int? leaderId)
+    {
+        var team = new Team { Name = teamName, Image = image };
+        this._context.Teams.Add(team);
+        await this._context.SaveChangesAsync();
+        if (leaderId.HasValue)
+        {
+            this._context.Users.Update(new User { Id = leaderId.Value, TeamId = team.Id, IsLeader = true });
+            await this._context.SaveChangesAsync();
+        }
+
+        return team.ToDto();
+    }
+
+    public async Task<byte[]> GetImage(int teamId)
+    {
+        //TODO: Avoid load all for the image
+        var team = await this._context.Teams.FindAsync(teamId);
+        return team.Image;
+    }
+
+    public async Task MakeLeader(int teamId, int userId)
+    {
+        await _context.Database.ExecuteSqlRawAsync("UPDATE Users SET IsLeader = 0 WHERE TeamId = {0}", teamId);
+        await _context.Database.ExecuteSqlRawAsync("UPDATE Users SET IsLeader = 1 WHERE TeamId = {0} AND Id = {1}", teamId, userId);
     }
 }

@@ -25,7 +25,7 @@ namespace Goc.Models
         public virtual ActionTypes ActionType { get; set; }
         public virtual User TeamCharacter { get; set; }
         public virtual Missions Mission { get; set; }
-        public virtual Teams Team { get; set; }
+        public virtual Team Team { get; set; }
         public virtual ICollection<Evidences> Evidences { get; set; }
     }
 }
