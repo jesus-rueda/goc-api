@@ -10,46 +10,74 @@ namespace Goc.Models
     using System.Text.Json.Serialization;
 
     [Table("Users")]
-    public partial class User : IUser
+    public  class User
     {
         public User()
         {
-            ActionsLog = new HashSet<ActionsLog>();
-            Evidences = new HashSet<Evidences>();
+            Mermberships = new HashSet<Membership>();
         }
 
         public int Id { get; set; }
-        public int? TeamId { get; set; }
-        public int? CharacterId { get; set; }
+        
         public string Upn { get; set; }
-        public bool IsLeader { get; set; }
+        
         public bool IsAdmin { get; set; }
+
+        [JsonIgnore]
+        public virtual ICollection<Membership> Mermberships { get; set; }
+    }
+
+    [Table("TeamsCharacters")]
+    public partial class Membership
+    {
+        [Column("TeamCharacterId")]
+        public int MembershipId { get; set; }
+
+
+        public Membership()
+        {
+            ActionsLog = new HashSet<ActionLog>();
+            Evidences = new HashSet<Evidence>();
+        }
+
+        public User? User { get; set; }
+
+        [JsonIgnore]
+        public virtual ICollection<ActionLog> ActionsLog { get; set; }
+
+        [JsonIgnore]
+        public virtual ICollection<Evidence> Evidences { get; set; }
+
+        public int? UserId { get; set; }
+
+        public int? TeamId { get; set; }
+
+        public int? CharacterId { get; set; }
+
+        public int CampaignId { get; set; }
+
+        public bool IsLeader { get; set; }
 
         public bool PendingAproval { get; set; }
 
-        [JsonIgnore]
-        public virtual ICollection<ActionsLog> ActionsLog { get; set; }
-        [JsonIgnore]
-        public virtual ICollection<Evidences> Evidences { get; set; }
-        [JsonIgnore]
         public virtual Character? Character { get; set; }
-        [JsonIgnore]
+
         public virtual Team? Team { get; set; }
     }
 
-    public interface IUser
+    public interface ICampaingProfile
     {
         
-        public int Id { get; set; }
+        public int Id { get; }
         
-        public int? TeamId { get; set; }
+        public int? TeamId { get;  }
         
-        public int? CharacterId { get; set; }
+        public int? CharacterId { get;  }
         
-        public string Upn { get; set; }
-        
-        public bool IsLeader { get; set; }
-        
-        public bool IsAdmin { get; set; }
+        public string Upn { get;  }
+
+        public bool IsLeader { get; }
+
+        public bool IsAdmin { get;  }
     }
 }

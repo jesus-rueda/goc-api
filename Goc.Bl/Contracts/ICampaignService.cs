@@ -3,7 +3,7 @@ using Goc.Models;
 
 namespace Goc.Business.Contracts;
 
-public interface ICampaignBl
+public interface ICampaignService
 {
-    Task<Campaigns> GetActive();
+    Task<Campaign> GetActive();
 }

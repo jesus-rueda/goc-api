@@ -8,9 +8,9 @@ namespace Goc.Business.Contracts
 {
     using Goc.Models;
 
-    public interface IUserBl
+    public interface IUserService
     {
-        Task<User> GetByUpn(string upn);
+        Task<ICampaingProfile> GetByUpn(string upn);
 
         Task AutoRegisterUser(string upn);
     }

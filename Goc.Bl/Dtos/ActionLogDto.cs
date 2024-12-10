@@ -2,7 +2,7 @@
 
 namespace Goc.Business.Dtos;
 
-public partial class ActionsLogDto
+public partial class ActionLogDto
 {
     public long Id { get; set; }
     public int MissionId { get; set; }

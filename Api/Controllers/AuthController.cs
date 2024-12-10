@@ -40,11 +40,11 @@ public class AuthController : ControllerBase
 
     public static MemoryCache myCache = new(new MemoryCacheOptions() { });
 
-    private readonly IUserBl myUsers;
+    private readonly IUserService myUsers;
 
     #endregion
 
-    public AuthController(IUserBl users)
+    public AuthController(IUserService users)
     {
         this.myUsers = users;
     }
@@ -162,7 +162,7 @@ public class AuthController : ControllerBase
     [HttpGet]
     [Authorize]
     [Route("profile")]
-    public async Task<ActionResult<IUser>> GetProfile()
+    public async Task<ActionResult<ICampaingProfile>> GetProfile()
     {
         var user = this.User.GetGocUser();
         return this.Ok(user);

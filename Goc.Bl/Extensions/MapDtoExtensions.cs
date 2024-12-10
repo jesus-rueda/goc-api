@@ -7,7 +7,7 @@ namespace Goc.Business.Extensions;
 
 public static class MapDtoExtensions
 {
-    public static MissionsDto ToDto(this Missions mission)
+    public static MissionsDto ToDto(this Mission mission)
     {
         return new MissionsDto
         {
@@ -21,7 +21,7 @@ public static class MapDtoExtensions
         };
     }
 
-    public static List<MissionsDto> ToDto(this List<Missions> mission)
+    public static List<MissionsDto> ToDto(this List<Mission> mission)
     {
         return mission.Select(m => m.ToDto()).ToList();
     }
@@ -43,7 +43,7 @@ public static class MapDtoExtensions
         return teams.Select(t => t.ToDto()).ToList();
     }
 
-    public static TeamCharacterProfileDto ToDto(this User teamCharacter)
+    public static TeamCharacterProfileDto ToDto(this Membership teamCharacter)
     {
         if (teamCharacter == null)
         {
@@ -52,9 +52,9 @@ public static class MapDtoExtensions
 
         return new TeamCharacterProfileDto
         {
-            Id = teamCharacter.Id,
-            Upn = teamCharacter.Upn,
-            CharacterId = teamCharacter.CharacterId??0,
+            Id = teamCharacter.User.Id,
+            Upn = teamCharacter.User.Upn,
+            CharacterId = teamCharacter.CharacterId ?? 0,
             CharacterName = teamCharacter.Character?.Name,
             IsLeader = teamCharacter.IsLeader ? 1 : 0,
             TeamId = teamCharacter.TeamId ?? 0,
@@ -63,7 +63,7 @@ public static class MapDtoExtensions
         };
     }
 
-    public static EvidencesDto ToDto(this Evidences evidence)
+    public static EvidencesDto ToDto(this Evidence evidence)
     {
         return new EvidencesDto
         {
@@ -75,36 +75,36 @@ public static class MapDtoExtensions
         };
     }
 
-    public static List<EvidencesDto> ToDto(this List<Evidences> evidences)
+    public static List<EvidencesDto> ToDto(this List<Evidence> evidences)
     {
         return evidences.Select(t => t.ToDto()).ToList();
     }
 
-    public static MessagesDto ToDto(this Messages message)
+    public static MessagesDto ToDto(this Message message)
     {
         return new MessagesDto
         {
             Id = message.Id,
             SenderTeam = message.SenderTeam,
             RecipientTeam = message.RecipientTeam,
-            Message = message.Message,
+            Message = message.Text,
             DateTime = message.DateTime,
         };
     }
 
-    public static List<MessagesDto> ToDto(this List<Messages> messages)
+    public static List<MessagesDto> ToDto(this List<Message> messages)
     {
         return messages.Select(m => m.ToDto()).ToList();
     }
 
-    public static Messages ToEntity(this MessagesDto message)
+    public static Message ToEntity(this MessagesDto message)
     {
-        return new Messages
+        return new Message
         {
             Id = message.Id,
             SenderTeam = message.SenderTeam,
             RecipientTeam = message.RecipientTeam,
-            Message = message.Message,
+            Text = message.Message,
             DateTime = message.DateTime,
         };
     }

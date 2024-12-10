@@ -1,96 +1,86 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using Goc.Business.Contracts;
-using Goc.Business.Dtos;
-using Goc.Business.Extensions;
-using Microsoft.AspNetCore.Mvc;
+﻿// <copyright company="ROSEN Swiss AG">
+//  Copyright (c) ROSEN Swiss AG
+//  This computer program includes confidential, proprietary
+//  information and is a trade secret of ROSEN. All use,
+//  disclosure, or reproduction is prohibited unless authorized in
+//  writing by an officer of ROSEN. All Rights Reserved.
+// </copyright>
 
 namespace Goc.Api.Controllers;
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks;
+using Goc.Business.Contracts;
+using Goc.Business.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
-using System.IO;
-using System;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
 [ApiController]
 [Authorize]
-[Route("api/[controller]")]
+[Route("api/")]
 public class TeamsController : ControllerBase
 {
-    private readonly ITeamBl _teamBl;
+    #region Fields
 
-    public TeamsController(ITeamBl teamsBl)
+    private readonly ICampaignService myCampaignService;
+
+    private readonly ITeamService myTeamService;
+
+    #endregion
+
+    #region Constructors
+
+    public TeamsController(ITeamService teamsService, ICampaignService campaign)
     {
-        _teamBl = teamsBl;
+        this.myTeamService = teamsService;
+        this.myCampaignService = campaign;
     }
 
+    #endregion
 
-
-
-    [HttpGet]
-    [Route("")]
-    public async Task<ActionResult<List<TeamDto>>> GetAllTeams()
-    {
-        var teams = await _teamBl.GetAllAsync();
-        return teams;
-    }
-
-    [HttpGet]
-    [Route("{teamId}")]
-    public async Task<ActionResult<TeamDto>> Get(int teamId)
-    {
-        var team = await _teamBl.GetAsync(teamId);
-        if (team == null)
-        {
-            return NotFound();
-        }
-
-        return team;
-    }
-
-    [HttpPost]
-    [Route("{teamId}/joins")]
-    public async Task<ActionResult<JoinRequestsResponse>> Join([FromRoute] int teamId, [FromBody] JoinRequets request)
-    {
-        var user = this.User.GetGocUser();
-        await this._teamBl.RequestJoin(user.Id, teamId, request.CharacterId);
-        return new JoinRequestsResponse { Placed = true };
-    }
-
-    [HttpGet]
-    [Authorize(Roles = "leader")]
-    [Route("{teamId}/joins")]
-    public async Task<ActionResult<ResultCollection<UserProfile>>> GetJoinRequests(int teamId)
-    {
-        var user = this.User.GetGocUser();
-        if (user.TeamId != teamId)
-        {
-            return this.Forbid();
-        }
-
-        var users = await this._teamBl.GetPendingJoinAprovals(teamId);
-        return this.Ok(users.ToResultCollection());
-    }
+    #region Methods
 
     [HttpPost]
     [Authorize(Roles = "leader")]
-    [Route("{teamId}/joins/aprovals")]
+    [Route("[controller]/{teamId}/joins/aprovals")]
     public async Task<ActionResult> Aprove(int teamId, AproveJoinRequests request)
     {
+        return await Aprove(null, teamId, request);
+    }
+
+    [HttpPost]
+    [Authorize(Roles = "leader")]
+    [Route("Campaigns/{campaignId}/[controller]/{teamId}/joins/aprovals")]
+    public async Task<ActionResult> Aprove(
+        [FromRoute] int? campaignId,
+        [FromRoute] int teamId, AproveJoinRequests request)
+    {
         var user = this.User.GetGocUser();
         if (user.TeamId != teamId)
         {
             return this.Forbid();
         }
-
-        await this._teamBl.AproveJoinRequest(teamId, request.UserId, request.Aprove);
+        if(campaignId == null)
+        {
+            var campaign = await this.myCampaignService.GetActive();
+            campaignId = campaign.Id;
+        }
+        
+        await this.myTeamService.ApproveJoinRequest(campaignId.Value, teamId, request.UserId, request.Aprove);
         return this.NoContent();
     }
 
+
+
+
+
     [HttpPost]
     [Authorize(Roles = "admin")]
-    [Route("")]
+    [Route("[controller]")]
     public async Task<ActionResult<TeamDto>> Create(IFormFile formFile)
     {
         var requestStr = this.Request.Form["request"];
@@ -102,30 +92,48 @@ public class TeamsController : ControllerBase
             using var ms = new MemoryStream();
             formFile.CopyTo(ms);
             bytes = ms.ToArray();
-
         }
-        var team = await this._teamBl.Create(request.Name, bytes, request.LeaderId);
+
+        var team = await this.myTeamService.Create(request.Name, bytes, request.LeaderId);
         return this.Ok(team);
     }
 
-
-
-    [HttpPost]
+    [HttpDelete]
+    [Route("[controller]/{teamId}")]
     [Authorize(Roles = "admin")]
-    [Route("{teamId}/leader/")]
-    public async Task<ActionResult> MakeLeader(int teamId, LeaderRequests requests)
-    {        
-        await this._teamBl.MakeLeader(teamId, requests.userId);
-        return this.Ok();
+    public async Task Delete(int teamId)
+    {
+        await this.myTeamService.Delete(teamId);
+    }
+
+    [HttpGet]
+    [Route("[controller]/{teamId}")]
+    public async Task<ActionResult<TeamDto>> Get(int teamId)
+    {
+        var team = await this.myTeamService.GetAsync(teamId);
+        if (team == null)
+        {
+            return this.NotFound();
+        }
+
+        return team;
+    }
+
+    [HttpGet]
+    [Route("[controller]")]
+    public async Task<ActionResult<List<TeamDto>>> GetAllTeams()
+    {
+        var teams = await this.myTeamService.GetAllAsync();
+        return teams;
     }
 
     [HttpGet]
     [AllowAnonymous]
-    [Route("{teamId}/image")]
+    [Route("[controller]/{teamId}/image")]
     public async Task GetImage([FromRoute] int teamId)
     {
-        var image = await _teamBl.GetImage(teamId); // replace with actual method to get image
-        
+        var image = await this.myTeamService.GetImage(teamId); // replace with actual method to get image
+
         if (image != null)
         {
             this.Response.ContentType = "image/png";
@@ -137,32 +145,135 @@ public class TeamsController : ControllerBase
         }
     }
 
+    [HttpGet]
+    [Authorize(Roles = "leader")]
+    [Route("campaigns/{campaignId}/[controller]/{teamId}/joins")]
+    public async Task<ActionResult<ResultCollection<UserProfile>>> GetJoinRequests(
+        [FromRoute] int? campaignId,
+        [FromRoute] int teamId)
+    {
+        var user = this.User.GetGocUser();
+        if (user.TeamId != teamId)
+        {
+            return this.Forbid();
+        }
+        if(campaignId == null)
+        {
+            var campaign = await this.myCampaignService.GetActive();
+            campaignId = campaign.Id;
+        }
 
-
-
+        var users = await this.myTeamService.GetPendingJoinApprovals(campaignId.Value, teamId);
+        return this.Ok(users.ToResultCollection());
+    }
 
     [HttpGet]
-    [Route("members/{memberId}/stats")]
-    public async Task<ActionResult<TeamMemberStats>> GetTeamMember(int memberId)
+    [Authorize(Roles = "leader")]
+    [Route("[controller]/{teamId}/joins")]
+    public async Task<ActionResult<ResultCollection<UserProfile>>> GetJoinRequests(int teamId)
     {
-        return await this._teamBl.GetTeamMemberStatsAsync(memberId);
+        return await this.GetJoinRequests(null, teamId);
+    }
+
+    [HttpGet]
+    [Route("[controller]/{teamId}/Mission/{missionId}")]
+    public async Task<ActionResult<TeamMission>> GetMissionProgress(int teamId, int missionId)
+    {
+        return await this.GetMissionProgress(null, missionId, teamId);
     }
 
 
+    [HttpGet]
+    [Route("Campaigns/{campaignId}/[controller]/{teamId}/Mission/{missionId}")]
+    public async Task<ActionResult<TeamMission>> GetMissionProgress(
+        [FromRoute] int? campaignId, 
+        [FromRoute] int teamId,
+        [FromRoute] int missionId)
+    {
+        if (campaignId == null)
+        {
+            var campaign = await this.myCampaignService.GetActive();
+            campaignId = campaign.Id;
+        }
 
-    [HttpDelete]
-    [Route("{teamId}")]
+        return await this.myTeamService.GetMissionProgressAsync(campaignId.Value, missionId, teamId);
+    }
+
+    [HttpGet]
+    [Route("[controller]/members/{userId}/stats")]
+    public async Task<ActionResult<TeamMemberStats>> GetTeamMemberStats(int userId)
+    {
+        return await this.GetTeamMemberStats(null , userId);
+    }
+
+    [HttpGet]
+    [Route("Campaigns/{campaignId}/[controller]/members/{userId}/stats")]
+    public async Task<ActionResult<TeamMemberStats>> GetTeamMemberStats(
+        [FromRoute] int? campaignId,
+        [FromRoute] int userId
+        )
+    {
+        if (campaignId == null)
+        {
+            var campaign = await this.myCampaignService.GetActive();
+            campaignId = campaign.Id;
+        }
+
+        return await this.myTeamService.GetTeamMemberStatsAsync(campaignId.Value, userId);
+    }
+
+    [HttpPost]
+    [Route("[controller]/{teamId}/joins")]
+    public async Task<ActionResult<JoinRequestsResponse>> Join([FromRoute] int teamId, [FromBody] JoinRequets request)
+    {
+        return await this.Join(null, teamId, request);
+    }
+
+    [HttpPost]
+    [Route("Campaigns/{campaignId}/[controller]/{teamId}/joins")]
+    public async Task<ActionResult<JoinRequestsResponse>> Join(
+        [FromRoute] int? campaignId,
+        [FromRoute] int teamId, 
+        [FromBody] JoinRequets request)
+    {
+        if(campaignId == null)
+        {
+            var campaign = await this.myCampaignService.GetActive();
+            campaignId = campaign.Id;
+        }
+        
+        var user = this.User.GetGocUser();
+        await this.myTeamService.RequestJoin(campaignId.Value, user.Id, teamId, request.CharacterId);
+        return new JoinRequestsResponse { Placed = true };
+    }
+
+    [HttpPost]
     [Authorize(Roles = "admin")]
-    public async Task Delete(int teamId)
+    [Route("[controller]/{teamId}/leader/")]
+    public async Task<ActionResult> MakeLeader(
+        [FromRoute] int teamId,
+        [FromBody] LeaderRequests requests)
     {
-        await this._teamBl.Delete(teamId);
+        return await this.MakeLeader(null, teamId, requests);
     }
 
-
-    [HttpGet]
-    [Route("{teamId}/Mission/{missionId}")]
-    public async Task<ActionResult<TeamMission>> GetMission(int teamId, int missionId)
+    [HttpPost]
+    [Authorize(Roles = "admin")]
+    [Route("Campaigns/{campaignId}/[controller]/{teamId}/leader/")]
+    public async Task<ActionResult> MakeLeader(
+        [FromRoute] int? campaignId,
+        [FromRoute] int teamId,
+        [FromBody] LeaderRequests requests)
     {
-        return await this._teamBl.GetMissionProgressAsync(missionId, teamId);
+        if(campaignId == null)
+        {
+            var campaign = await this.myCampaignService.GetActive();
+            campaignId = campaign.Id;
+        }
+        
+        await this.myTeamService.MakeLeader(campaignId.Value, teamId, requests.userId);
+        return this.Ok();
     }
+
+    #endregion
 }

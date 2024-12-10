@@ -29,7 +29,7 @@ public class MissionsController
         return missions;
     }
 
-    [HttpGet("/api/Campaigns/{campaignId}/Missions")]
+    [HttpGet("/api/campaigns/{campaignId}/missions")]
     public async Task<ActionResult<List<MissionsDto>>> GetCampaignMissions(int campaignId)
     {
         return await _missionBl.GetCampaignMissionsAsync(campaignId);

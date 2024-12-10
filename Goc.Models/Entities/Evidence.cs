@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace Goc.Models
 {
-    public partial class Evidences
+    public partial class Evidence
     {
         public long Id { get; set; }
         public long ActionLogId { get; set; }
@@ -13,7 +13,7 @@ namespace Goc.Models
         public string Image { get; set; }
         public bool IsValid { get; set; }
 
-        public virtual ActionsLog ActionLog { get; set; }
-        public virtual User TeamCharacter { get; set; }
+        public virtual ActionLog ActionLog { get; set; }
+        public virtual Membership TeamCharacter { get; set; }
     }
 }

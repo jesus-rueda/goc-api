@@ -11,12 +11,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Goc.Business;
 
-public class MessageBl : IMessageBl
+public class MessageService : IMessageService
 {
     private readonly GocContext _context;
     private readonly INotificationSerive _notificacionService;
 
-    public MessageBl(GocContext context, INotificationSerive notificacionService)
+    public MessageService(GocContext context, INotificationSerive notificacionService)
     {
         _context = context;
         _notificacionService = notificacionService;
@@ -24,7 +24,7 @@ public class MessageBl : IMessageBl
 
     public async Task<MessagesDto> CreateAsync(MessagesDto messageDto)
     {
-        Messages message = messageDto.ToEntity();
+        Message message = messageDto.ToEntity();
         if (message == null)
         {
             throw new Exception("Argument message is not valid");

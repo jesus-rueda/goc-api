@@ -5,7 +5,7 @@ using Goc.Business.Dtos;
 
 namespace Goc.Business.Contracts
 {
-    public interface IMessageBl
+    public interface IMessageService
     {
         Task<List<MessagesDto>> GetAsync(int teamId, DateTime date);
 

@@ -11,18 +11,18 @@ namespace Goc.Api.Controllers;
 [Route("api/[controller]")]
 public class MessagesController
 {
-    private readonly IMessageBl _messageBl;
+    private readonly IMessageService myMessageService;
 
-    public MessagesController(IMessageBl messageBl)
+    public MessagesController(IMessageService messageService)
     {
-        _messageBl = messageBl;
+        this.myMessageService = messageService;
     }
 
     [HttpGet]
     [Route("{teamId}/{date}")]
     public async Task<ActionResult<List<MessagesDto>>> Get(int teamId, DateTime date)
     {
-        var messages = await _messageBl.GetAsync(teamId, date);
+        var messages = await this.myMessageService.GetAsync(teamId, date);
 
         return messages;
     }

@@ -10,28 +10,33 @@ public partial class GocContext : DbContext
 {
     public GocContext()
     {
+        
     }
 
     public GocContext(DbContextOptions<GocContext> options)
         : base(options)
     {
+        
     }
 
-    public virtual DbSet<ActionTypes> ActionTypes { get; set; }
-    public virtual DbSet<ActionsLog> ActionsLog { get; set; }
-    public virtual DbSet<Campaigns> Campaigns { get; set; }
+    public virtual DbSet<ActionType> ActionTypes { get; set; }
+    public virtual DbSet<ActionLog> ActionsLog { get; set; }
+    public virtual DbSet<Campaign> Campaigns { get; set; }
     public virtual DbSet<Character> Characters { get; set; }
-    public virtual DbSet<Evidences> Evidences { get; set; }
-    public virtual DbSet<MessageTemplates> MessageTemplates { get; set; }
-    public virtual DbSet<Messages> Messages { get; set; }
-    public virtual DbSet<Missions> Missions { get; set; }
+    public virtual DbSet<Evidence> Evidences { get; set; }
+    public virtual DbSet<MessageTemplate> MessageTemplates { get; set; }
+    public virtual DbSet<Message> Messages { get; set; }
+    public virtual DbSet<Mission> Missions { get; set; }
     public virtual DbSet<Team> Teams { get; set; }
     
     public virtual DbSet<User> Users { get; set; }
 
+    public virtual DbSet<Membership> Memberships { get; set; }
+
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<ActionTypes>(entity =>
+        modelBuilder.Entity<ActionType>(entity =>
         {
             entity.Property(e => e.Id).ValueGeneratedNever();
 
@@ -40,7 +45,17 @@ public partial class GocContext : DbContext
                 .HasMaxLength(20);
         });
 
-        modelBuilder.Entity<ActionsLog>(entity =>
+        modelBuilder.Entity<Membership>(
+                                        entity =>
+                                        {
+                                            entity.HasKey(p => p.MembershipId);
+                                            entity.HasOne(x => x.User)
+                                                .WithMany(x=>x.Mermberships);
+                                            //entity.HasOne(d => d.Character);
+                                            //entity.HasOne(x => x.Team);
+                                        });
+
+        modelBuilder.Entity<ActionLog>(entity =>
         {
             entity.Property(e => e.Id).UseIdentityColumn();
 
@@ -72,7 +87,7 @@ public partial class GocContext : DbContext
                 .HasConstraintName("FK_ActionsLog_AffectedTeams");
         });
 
-        modelBuilder.Entity<Campaigns>(entity =>
+        modelBuilder.Entity<Campaign>(entity =>
         {
             entity.Property(e => e.Id).ValueGeneratedNever();
 
@@ -85,11 +100,11 @@ public partial class GocContext : DbContext
             entity.Property(e => e.StartDate).HasColumnType("smalldatetime");
 
             entity.HasMany(d => d.Mission)
-                .WithMany(p => p.Campaign)
+                .WithMany(p => p.Campaigns)
                 .UsingEntity<Dictionary<string, object>>(
                     "CampaignsMissions",
-                    l => l.HasOne<Missions>().WithMany().HasForeignKey("MissionId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK_CampaignsMissions_Missions"),
-                    r => r.HasOne<Campaigns>().WithMany().HasForeignKey("CampaignId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK_CampaignsMissions_Campaigns"),
+                    l => l.HasOne<Mission>().WithMany().HasForeignKey("MissionId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK_CampaignsMissions_Missions"),
+                    r => r.HasOne<Campaign>().WithMany().HasForeignKey("CampaignId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK_CampaignsMissions_Campaigns"),
                     j =>
                     {
                         j.HasKey("CampaignId", "MissionId");
@@ -123,7 +138,7 @@ public partial class GocContext : DbContext
                 .HasMaxLength(500);
         });
 
-        modelBuilder.Entity<Evidences>(entity =>
+        modelBuilder.Entity<Evidence>(entity =>
         {
             entity.Property(e => e.Id).UseIdentityColumn();
 
@@ -144,7 +159,7 @@ public partial class GocContext : DbContext
                 .HasConstraintName("FK_Evidences_Characters");
         });
 
-        modelBuilder.Entity<MessageTemplates>(entity =>
+        modelBuilder.Entity<MessageTemplate>(entity =>
         {
             entity.Property(e => e.Id).HasMaxLength(50);
 
@@ -163,13 +178,13 @@ public partial class GocContext : DbContext
                 .HasConstraintName("FK_MessageTemplates_ActionTypes");
         });
 
-        modelBuilder.Entity<Messages>(entity =>
+        modelBuilder.Entity<Message>(entity =>
         {
             entity.Property(e => e.Id).UseIdentityColumn();
 
             entity.Property(e => e.DateTime).HasColumnType("smalldatetime");
 
-            entity.Property(e => e.Message)
+            entity.Property(e => e.Text)
                 .IsRequired()
                 .HasMaxLength(1000);
 
@@ -186,7 +201,7 @@ public partial class GocContext : DbContext
                 .HasConstraintName("FK_Messages_SenderTeams");
         });
 
-        modelBuilder.Entity<Missions>(entity =>
+        modelBuilder.Entity<Mission>(entity =>
         {
             entity.Property(e => e.Id).ValueGeneratedNever();
 
@@ -218,19 +233,11 @@ public partial class GocContext : DbContext
 
         modelBuilder.Entity<User>(entity =>
         {
-            entity.Property(e => e.Id).UseIdentityColumn();
+            //entity.Property(e => e.Id).UseIdentityColumn();
+            entity.HasMany(x => x.Mermberships)
+                .WithOne(x=>x.User);
+            
 
-            entity.HasOne(d => d.Character)
-                .WithMany(p => p.TeamsCharacters)
-                .HasForeignKey(d => d.CharacterId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_TeamsCharacters_Characters");
-
-            entity.HasOne(d => d.Team)
-                .WithMany(p => p.TeamsCharacters)
-                .HasForeignKey(d => d.TeamId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_TeamsCharacters_Teams");
         });
 
         OnModelCreatingPartial(modelBuilder);

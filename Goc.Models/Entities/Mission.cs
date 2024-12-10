@@ -5,12 +5,12 @@ using System.Collections.Generic;
 
 namespace Goc.Models
 {
-    public partial class Missions
+    public partial class Mission
     {
-        public Missions()
+        public Mission()
         {
-            ActionsLog = new HashSet<ActionsLog>();
-            Campaign = new HashSet<Campaigns>();
+            this.ActionsLog = new HashSet<ActionLog>();
+            this.Campaigns = new HashSet<Campaign>();
         }
 
         public int Id { get; set; }
@@ -21,8 +21,8 @@ namespace Goc.Models
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
 
-        public virtual ICollection<ActionsLog> ActionsLog { get; set; }
+        public virtual ICollection<ActionLog> ActionsLog { get; set; }
 
-        public virtual ICollection<Campaigns> Campaign { get; set; }
+        public virtual ICollection<Campaign> Campaigns { get; set; }
     }
 }

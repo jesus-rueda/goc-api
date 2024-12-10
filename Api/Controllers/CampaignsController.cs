@@ -12,17 +12,17 @@ using Microsoft.AspNetCore.Authorization;
 [Route("api/[controller]")]
 public class CampaignsController : ControllerBase
 {
-    private readonly ICampaignBl _campaignBl;
+    private readonly ICampaignService myCampaignService;
 
-    public CampaignsController(ICampaignBl campaignBl)
+    public CampaignsController(ICampaignService campaignService)
     {
-        _campaignBl = campaignBl;
+        this.myCampaignService = campaignService;
     }
 
     [HttpGet]
     [Route("Active")]
-    public async Task<ActionResult<Campaigns>> GetActive()
+    public async Task<ActionResult<Campaign>> GetActive()
     {
-        return await _campaignBl.GetActive();
+        return await this.myCampaignService.GetActive();
     }
 }

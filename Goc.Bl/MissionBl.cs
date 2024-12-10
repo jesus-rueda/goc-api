@@ -31,7 +31,7 @@ public class MissionBl : IMissionBl
 
     public async Task<List<MissionsDto>> GetCampaignMissionsAsync(int campaignId)
     {
-        var missions = await _context.Missions.Where(c => c.Campaign.FirstOrDefault().Id == campaignId).ToListAsync();
+        var missions = await _context.Missions.Where(c => c.Campaigns.FirstOrDefault().Id == campaignId).ToListAsync();
         var missionsDto = missions.ToDto();
         missionsDto.ForEach(m =>
         {

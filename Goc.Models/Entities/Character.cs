@@ -10,9 +10,9 @@ namespace Goc.Models
     {
         public Character()
         {
-            //ActionsLog = new HashSet<ActionsLog>();
-            //Evidences = new HashSet<Evidences>();
-            TeamsCharacters = new HashSet<User>();
+            //ActionLog = new HashSet<ActionLog>();
+            //Evidence = new HashSet<Evidence>();
+            TeamsCharacters = new HashSet<Membership>();
         }
 
         public int Id { get; set; }
@@ -22,9 +22,10 @@ namespace Goc.Models
         public string Defense { get; set; }
         public string Bonus { get; set; }
 
-        //public virtual ICollection<ActionsLog> ActionsLog { get; set; }
-        //public virtual ICollection<Evidences> Evidences { get; set; }
+        //public virtual ICollection<ActionLog> ActionLog { get; set; }
+        //public virtual ICollection<Evidence> Evidence { get; set; }
+
         [JsonIgnore]
-        public virtual ICollection<User> TeamsCharacters { get; set; }
+        public virtual ICollection<Membership> TeamsCharacters { get; set; }
     }
 }

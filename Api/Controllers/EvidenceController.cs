@@ -17,35 +17,54 @@ namespace Goc.Api.Controllers
     [Route("api/[controller]")]
     public class EvidenceController : ControllerBase
     {
-        private readonly IEvidenceBl _evidenceBl;
+        private readonly IEvidenceService myEvidenceService;
 
-        public EvidenceController(IEvidenceBl evidenceBl)
+        private readonly ICampaignService myCampaignService;
+
+        public EvidenceController(IEvidenceService evidenceService, ICampaignService campaignService)
         {
-            _evidenceBl = evidenceBl;
+            this.myEvidenceService = evidenceService;
+            this.myCampaignService = campaignService;
+        }
+
+        [HttpPost]
+        [Route("{missionId}")]
+        
+        public async Task<ActionResult<EvidencesDto>> Create(IFormFile formFile, [FromRoute] int missionId)
+        {
+            return await this.Create(formFile, missionId, null);
         }
 
 
         [HttpPost]
-        [Route("{missionId}")]
-        public async Task<ActionResult<EvidencesDto>> Create(IFormFile formFile, [FromRoute] int missionId)
+        [Route("{campaignId}/{missionId}")]
+        public async Task<ActionResult<EvidencesDto>> Create(IFormFile formFile,
+            [FromRoute] int missionId,
+            [FromRoute] int? campaignId)
         {
+            var user = this.User.GetGocUser();
+
             var actionString = this.Request.Form["action"];
-            var action = JsonConvert.DeserializeObject<ActionsLogDto>(actionString);
+            var action = JsonConvert.DeserializeObject<ActionLogDto>(actionString);
 
             var imageBase64 = "";
-            if (formFile != null && formFile.Length > 0 && action.ActionTypeId != 2)
+            if (formFile is { Length: > 0 } && action.ActionTypeId != 2)
             {
-                using (MemoryStream ms = new MemoryStream())
-                {
-                    formFile.CopyTo(ms);
-                    byte[] fileBytes = ms.ToArray();
-                    imageBase64 = Convert.ToBase64String(fileBytes);
-                }
+                using var ms = new MemoryStream();
+                await formFile.CopyToAsync(ms);
+                var fileBytes = ms.ToArray();
+                imageBase64 = Convert.ToBase64String(fileBytes);
             }
 
             try
             {
-                var evidence = await _evidenceBl.CreateAsync(action.MissionId, action.TeamId, action.ActionTypeId, action.TeamCharacterId, action.AffectedTeamId, imageBase64);
+                if (campaignId == null)
+                {
+                    var campaign = await this.myCampaignService.GetActive();
+                    campaignId = campaign.Id;
+                }
+
+                var evidence = await this.myEvidenceService.CreateAsync(campaignId.Value, action.MissionId, action.TeamId, action.ActionTypeId, user.Id, action.AffectedTeamId, imageBase64);
                 return evidence;
             }
             catch (Exception exc)

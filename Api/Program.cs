@@ -37,7 +37,11 @@ builder.Services.AddCors(
                 .AllowCredentials();
         }));
 
-builder.Services.AddDbContext<GocContext>(option => option.UseSqlServer(builder.Configuration.GetConnectionString("db")));
+builder.Services.AddDbContext<GocContext>(option =>
+{
+    var connection = builder.Configuration.GetConnectionString("db");
+    option.UseSqlServer(connection);
+});
 builder.Services.AddBusiness();
 
 builder.Services.AddControllers();
@@ -79,7 +83,7 @@ var app = builder.Build();
 authValidator = async context =>
 {
     await using var scope = app.Services.CreateAsyncScope();
-    var users = scope.ServiceProvider.GetService<IUserBl>();
+    var users = scope.ServiceProvider.GetService<IUserService>();
     var user = await users.GetByUpn(context.Principal.Identity.Name);
     if (user == null)
     {

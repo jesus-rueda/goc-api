@@ -5,11 +5,11 @@ using System.Collections.Generic;
 
 namespace Goc.Models
 {
-    public partial class ActionsLog
+    public partial class ActionLog
     {
-        public ActionsLog()
+        public ActionLog()
         {
-            Evidences = new HashSet<Evidences>();
+            Evidences = new HashSet<Evidence>();
         }
 
         public long Id { get; set; }
@@ -22,10 +22,10 @@ namespace Goc.Models
         public int MissionId { get; set; }
         public int Coinks { get; set; }
 
-        public virtual ActionTypes ActionType { get; set; }
-        public virtual User TeamCharacter { get; set; }
-        public virtual Missions Mission { get; set; }
+        public virtual ActionType ActionType { get; set; }
+        public virtual Membership TeamCharacter { get; set; }
+        public virtual Mission Mission { get; set; }
         public virtual Team Team { get; set; }
-        public virtual ICollection<Evidences> Evidences { get; set; }
+        public virtual ICollection<Evidence> Evidences { get; set; }
     }
 }

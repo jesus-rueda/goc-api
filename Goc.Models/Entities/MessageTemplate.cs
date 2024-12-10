@@ -5,13 +5,13 @@ using System.Collections.Generic;
 
 namespace Goc.Models
 {
-    public partial class MessageTemplates
+    public partial class MessageTemplate
     {
         public string Id { get; set; }
         public string Name { get; set; }
         public string Body { get; set; }
         public int ActionTypeId { get; set; }
 
-        public virtual ActionTypes ActionType { get; set; }
+        public virtual ActionType ActionType { get; set; }
     }
 }
