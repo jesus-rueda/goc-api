@@ -13,7 +13,8 @@ public static class DependencyContainer
         services.AddScoped<ICharacterBl, CharacterBl>();
         services.AddScoped<ITeamService, TeamService>();
         services.AddScoped<IUserService, UsersService>();
-        services.AddScoped<IMissionBl, MissionBl>();
+        services.AddScoped<IMissionService, MissionService>();
+        services.AddScoped<IActionsService, ActionsService>();
         services.AddScoped<IEvidenceService, EvidenceService>();
         services.AddScoped<IMessageService, MessageService>();
 

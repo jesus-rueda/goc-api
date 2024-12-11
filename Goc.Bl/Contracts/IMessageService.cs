@@ -9,6 +9,6 @@ namespace Goc.Business.Contracts
     {
         Task<List<MessagesDto>> GetAsync(int teamId, DateTime date);
 
-        Task<MessagesDto> CreateAsync(MessagesDto message);
+        Task<MessagesDto> SendAsync(MessagesDto message);
     }
 }

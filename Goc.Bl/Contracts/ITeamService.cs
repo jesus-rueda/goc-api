@@ -23,9 +23,9 @@ public interface ITeamService
 
     Task Delete(int teamId);
 
-    Task<List<TeamDto>> GetAllAsync();
+    Task<List<TeamDto>> GetAllAsync(int campaignId);
 
-    Task<TeamDto> GetAsync(int id);
+    Task<TeamDto> GetAsync(int campaignId, int id);
 
     Task<byte[]> GetImage(int teamId);
 

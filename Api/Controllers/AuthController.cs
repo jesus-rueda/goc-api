@@ -29,6 +29,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
+using ActionResult = Microsoft.AspNetCore.Mvc.ActionResult;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -168,7 +169,7 @@ public class AuthController : ControllerBase
     [HttpGet]
     [Authorize]
     [Route("profile")]
-    public async Task<ActionResult<ICampaingProfile>> GetProfile()
+    public async Task<ActionResult<ICampaignProfile>> GetProfile()
     {
         var user = this.User.GetGocUser();
         return this.Ok(user);

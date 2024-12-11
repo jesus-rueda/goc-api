@@ -23,13 +23,16 @@ public class TeamService : ITeamService
 
     private readonly GocContext _context;
 
+    private readonly ICampaignService myCampaignService;
+
     #endregion
 
     #region Constructors
 
-    public TeamService(GocContext context)
+    public TeamService(GocContext context, ICampaignService campaignService)
     {
         this._context = context;
+        this.myCampaignService = campaignService;
     }
 
     #endregion
@@ -84,28 +87,44 @@ public class TeamService : ITeamService
         await this._context.Database.ExecuteSqlRawAsync("DELETE FROM dbo.Teams WHERE Id = {0}", teamId);
     }
 
-    public async Task<List<TeamDto>> GetAllAsync()
+    public async Task<List<TeamDto>> GetAllAsync(int campaignId)
     {
-        var teams = await this._context.Teams.ToListAsync();
+        var teams = await this._context.Teams
+            .Include(x=>x.TeamsCharacters.Where(x=>x.CampaignId == campaignId))
+            .ThenInclude(x=>x.User)
+            .ToListAsync();
+
+
         return teams.Select(x => x.ToDto())
             .ToList();
     }
 
-    public async Task<TeamDto> GetAsync(int id)
+    public async Task<TeamDto> GetAsync(int campaignId, int id)
     {
         var team = await this._context.Teams
-            .Include(x => x.TeamsCharacters)
-            .ThenInclude(x => x.User)
-            .FirstAsync(x => x.Id == id);
+            .Include(x => x.TeamsCharacters.Where(x=>x.CampaignId == campaignId))
+            .ThenInclude(x=>x.User)
+            .FirstOrDefaultAsync(x=>x.Id == id);
+            
 
         var dto = team.ToDto();
 
         var teamMembersCount = await this._context.Memberships.CountAsync(x => x.TeamId == id && !x.PendingAproval);
 
-        dto.AttacksDone = await this._context.ActionsLog.CountAsync(x => x.TeamId == id && x.ActionTypeId == 2);
-        dto.AttacksTotal = teamMembersCount * 5;
-        dto.DefensesTotal = teamMembersCount * 5;
-        dto.DefensesUsed = await this._context.ActionsLog.CountAsync(x => x.TeamId == id && x.ActionTypeId == 3);
+        dto.AttacksDone = await this._context.ActionsLog
+            .Include(x=>x.TeamCharacter)
+            .CountAsync(x => x.TeamCharacter.TeamId == id && x.ActionTypeId == (int)ActionType.Attack);
+
+        var attackPars = await this.myCampaignService.GetParametersFor(campaignId, ActionType.Attack);
+        var deffensePars = await this.myCampaignService.GetParametersFor(campaignId, ActionType.SetupDefence);
+
+        dto.AttacksTotal = teamMembersCount * attackPars.MaxAllowed ?? 0;
+        dto.DefensesTotal = teamMembersCount * deffensePars.MaxAllowed ?? 0;
+
+
+        dto.DefensesUsed = await this._context.ActionsLog
+            .Include(x=>x.TeamCharacter)
+            .CountAsync(x => x.TeamCharacter.TeamId == id && x.ActionTypeId == (int)ActionType.SetupDefence);
 
         return dto;
     }
@@ -121,22 +140,24 @@ public class TeamService : ITeamService
     {
         var total = await this._context.Memberships.CountAsync(c => c.TeamId == teamId && c.CampaignId == campaignId);
 
-        var q = this._context.ActionsLog
+        var actionsCount = await this._context.ActionsLog
             .Include(x=> x.TeamCharacter)
             .Include(a => a.Evidences)
             .Where(
-                   a => a.TeamId == teamId
+                   a => 
+                           a.TeamCharacter.TeamId == teamId
                         && a.MissionId == missionId 
                         && a.TeamCharacter.CampaignId == campaignId
-                        && a.Evidences.FirstOrDefault()
-                       .IsValid)
-            .GroupBy(a => a.TeamCharacterId);
-
-        var actionsCount = await q.CountAsync();
+                        && a.Evidences.Any(e=>e.IsValid))
+            .GroupBy(a => a.TeamCharacterId)
+            .CountAsync();
 
         var progress = 100 * actionsCount / total;
 
-        return new TeamMission { MissionCompleteness = progress };
+        return new TeamMission
+               {
+                   MissionCompleteness = progress
+               };
     }
 
     public async Task<List<Membership>> GetPendingJoinApprovals(int campaignId, int teamId)
@@ -147,16 +168,21 @@ public class TeamService : ITeamService
 
     public async Task<TeamMemberStats> GetTeamMemberStatsAsync(int campaignId, int userId)
     {
+        
+
         var attacks = await this._context.ActionsLog
             .Include(x=>x.TeamCharacter)
             .CountAsync(a => a.TeamCharacter.UserId == userId 
                              && a.TeamCharacter.CampaignId == campaignId
-                             && a.ActionTypeId == 2);
+                             && a.ActionTypeId == (int)ActionType.Attack);
 
         var defends = await this._context.ActionsLog.Include(x => x.TeamCharacter)
-            .CountAsync(a => a.TeamCharacter.UserId == userId && a.TeamCharacter.CampaignId == campaignId && a.ActionTypeId == 3);
+            .CountAsync(a => a.TeamCharacter.UserId == userId && a.TeamCharacter.CampaignId == campaignId && a.ActionTypeId == (int)ActionType.SetupDefence);
 
-        return new TeamMemberStats { AttacksDone = attacks, AttacksTotal = 5, DefensesTotal = 5, DefensesUsed = defends };
+        var attackPars = await this.myCampaignService.GetParametersFor(campaignId, ActionType.Attack);
+        var deffensePars = await this.myCampaignService.GetParametersFor(campaignId, ActionType.SetupDefence);
+
+        return new TeamMemberStats { AttacksDone = attacks, AttacksTotal = attackPars.MaxAllowed ?? 0, DefensesTotal = deffensePars.MaxAllowed ?? 0, DefensesUsed = defends };
     }
 
     public async Task MakeLeader(int campaignId, int teamId, int userId)

@@ -22,7 +22,7 @@ public class MessageService : IMessageService
         _notificacionService = notificacionService;
     }
 
-    public async Task<MessagesDto> CreateAsync(MessagesDto messageDto)
+    public async Task<MessagesDto> SendAsync(MessagesDto messageDto)
     {
         Message message = messageDto.ToEntity();
         if (message == null)

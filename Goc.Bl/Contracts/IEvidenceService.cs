@@ -4,11 +4,10 @@ using Goc.Business.Dtos;
 
 namespace Goc.Business.Contracts;
 
+using System;
+using System.IO;
+
 public interface IEvidenceService
 {
-    Task<List<EvidencesDto>> GetAllAsync();
-
-    Task<EvidencesDto> GetAsync(int id);
-
-    Task<EvidencesDto> CreateAsync(int campaignId, int missionId, int teamId, int actionId, int userId, int? affectedTeamId, string image);
+    public Task RegisterAsync(int campaignId, ActionType action, int membershipId, int coinks, TimeSpan duration, int? affectedTeamId = null, int? missionId = null, byte[]? evidence = null);
 }

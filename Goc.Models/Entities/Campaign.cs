@@ -9,7 +9,8 @@ namespace Goc.Models
     {
         public Campaign()
         {
-            Mission = new HashSet<Mission>();
+            this.Mission = new HashSet<Mission>();
+            this.MissionCampaigns = new HashSet<MissionCampaign>();
         }
 
         public int Id { get; set; }
@@ -18,5 +19,7 @@ namespace Goc.Models
         public DateTime EndDate { get; set; }
 
         public virtual ICollection<Mission> Mission { get; set; }
+
+        public virtual ICollection<MissionCampaign> MissionCampaigns { get; set; }
     }
 }

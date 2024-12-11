@@ -4,10 +4,14 @@ using Goc.Business.Dtos;
 
 namespace Goc.Business.Contracts
 {
-    public interface IMissionBl
+    using System.IO;
+    using Goc.Models;
+
+    public interface IMissionService
     {
-        Task<MissionsDto> GetAsync(int id);
+        Task<MissionsDto> GetAsync(int campaignId, int id);
 
         Task<List<MissionsDto>> GetCampaignMissionsAsync(int campaignId);
+        
     }
 }

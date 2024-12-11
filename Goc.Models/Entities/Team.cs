@@ -9,7 +9,6 @@ namespace Goc.Models
     {
         public Team()
         {
-            ActionsLog = new HashSet<ActionLog>();
             MessagesRecipientTeamNavigation = new HashSet<Message>();
             MessagesSenderTeamNavigation = new HashSet<Message>();
             TeamsCharacters = new HashSet<Membership>();
@@ -22,7 +21,7 @@ namespace Goc.Models
         //TODO: Avoid load the image in all the queries
         public byte[]? Image { get; set; }
 
-        public virtual ICollection<ActionLog> ActionsLog { get; set; }
+        
         public virtual ICollection<Message> MessagesRecipientTeamNavigation { get; set; }
         public virtual ICollection<Message> MessagesSenderTeamNavigation { get; set; }
         public virtual ICollection<Membership> TeamsCharacters { get; set; }

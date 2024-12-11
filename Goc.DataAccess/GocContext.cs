@@ -80,11 +80,11 @@ public partial class GocContext : DbContext
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_ActionsLog_Missions");
 
-            entity.HasOne(d => d.Team)
-                .WithMany(p => p.ActionsLog)
-                .HasForeignKey(d => d.TeamId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_ActionsLog_AffectedTeams");
+            //entity.HasOne(d => d.Team)
+            //    .WithMany(p => p.ActionsLog)
+            //    .HasForeignKey(d => d.TeamId)
+            //    .OnDelete(DeleteBehavior.ClientSetNull)
+            //    .HasConstraintName("FK_ActionsLog_AffectedTeams");
         });
 
         modelBuilder.Entity<Campaign>(entity =>
@@ -101,14 +101,16 @@ public partial class GocContext : DbContext
 
             entity.HasMany(d => d.Mission)
                 .WithMany(p => p.Campaigns)
-                .UsingEntity<Dictionary<string, object>>(
+                .UsingEntity<MissionCampaign>(
                     "CampaignsMissions",
-                    l => l.HasOne<Mission>().WithMany().HasForeignKey("MissionId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK_CampaignsMissions_Missions"),
-                    r => r.HasOne<Campaign>().WithMany().HasForeignKey("CampaignId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK_CampaignsMissions_Campaigns"),
+                    r => r.HasOne(x=>x.Mission)
+                        .WithMany(x=>x.MissionCampaigns).HasForeignKey("MissionId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK_CampaignsMissions_Missions"),
+                    l => l.HasOne( x => x.Campaign).WithMany(x=>x.MissionCampaigns).HasForeignKey("CampaignId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK_CampaignsMissions_Campaigns"),
                     j =>
                     {
+                        j.Property(p => p.StartDate).HasColumnType("smalldatetime");
+                        j.Property(p => p.EndDate).HasColumnType("smalldatetime");
                         j.HasKey("CampaignId", "MissionId");
-
                         j.ToTable("CampaignsMissions");
                     });
         });
@@ -205,8 +207,6 @@ public partial class GocContext : DbContext
         {
             entity.Property(e => e.Id).ValueGeneratedNever();
 
-            entity.Property(e => e.EndDate).HasColumnType("smalldatetime");
-
             entity.Property(e => e.Story)
                 .IsRequired()
                 .HasMaxLength(500);
@@ -219,7 +219,7 @@ public partial class GocContext : DbContext
                 .IsRequired()
                 .HasMaxLength(100);
 
-            entity.Property(e => e.StartDate).HasColumnType("smalldatetime");
+            
         });
 
         modelBuilder.Entity<Team>(entity =>

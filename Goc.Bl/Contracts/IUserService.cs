@@ -10,8 +10,10 @@ namespace Goc.Business.Contracts
 
     public interface IUserService
     {
-        Task<ICampaingProfile> GetByUpn(string upn);
+        Task<ICampaignProfile> GetProfileByUpn(string upn);
 
         Task AutoRegisterUser(string upn);
+
+        Task<ICampaignProfile> GetCampaignProfile(int? campaignId, User user);
     }
 }
