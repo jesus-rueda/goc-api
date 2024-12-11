@@ -63,6 +63,11 @@ public class AuthController : ControllerBase
     public async Task<LoginResponse> logIn(Guid challengeId)
     {
         var challenge = AuthController.myCache.Get<DeviceAuthResponse>(challengeId);
+        if (challenge == null)
+        {
+            return new LoginResponse { IsAuthenticated = false, Message = "User not log in yet" };
+        }
+
         var device_code = challenge.DeviceCode;
         var client_id = "pars-dev";
         var grant_type = "urn:ietf:params:oauth:grant-type:device_code";
@@ -120,9 +125,10 @@ public class AuthController : ControllerBase
                                  // redirect response value.
                              };
 
+        await this.myUsers.AutoRegisterUser(claimsIdentity.Name);
         await this.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), authProperties);
         
-        await this.myUsers.AutoRegisterUser(claimsIdentity.Name);
+        
 
         // remove cache info
         AuthController.myCache.Remove(challengeId);

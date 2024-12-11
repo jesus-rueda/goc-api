@@ -75,6 +75,11 @@ internal class UsersService : IUserService
             .Where(x => x.Upn == upn)
             .FirstOrDefaultAsync();
 
+        if(user== null)
+        {
+            return null;
+        }
+
         var membership = await this.myContext.Memberships
             .Where(x => x.CampaignId == activeCampaign.Id && x.UserId == user.Id)
             .FirstOrDefaultAsync();
