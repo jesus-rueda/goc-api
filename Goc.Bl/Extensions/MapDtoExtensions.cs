@@ -52,6 +52,7 @@ public static class MapDtoExtensions
 
         return new TeamCharacterProfileDto
         {
+            MembershipId = teamCharacter.MembershipId,
             Id = teamCharacter.User.Id,
             Upn = teamCharacter.User.Upn,
             CharacterId = teamCharacter.CharacterId ?? 0,

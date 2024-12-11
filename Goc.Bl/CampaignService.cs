@@ -42,10 +42,10 @@ public class CampaignService : ICampaignService
                                                                                             }
                                                                                         },
                                                                                         {
-                                                                                            ActionType.Duel,
+                                                                                            ActionType.DuelChallenge,
                                                                                             new CampaignActionParameters()
                                                                                             {
-                                                                                                ActionType = ActionType.Duel,
+                                                                                                ActionType = ActionType.DuelChallenge,
                                                                                                 MaxAllowed = 5,
                                                                                                 Duration = TimeSpan.FromDays(2)
                                                                                             }

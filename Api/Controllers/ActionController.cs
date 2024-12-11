@@ -15,7 +15,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using ActionResult = Goc.Business.Contracts.ActionResult;
 
 [ApiController]
 [Authorize]
@@ -44,7 +43,7 @@ public class ActionsController : ControllerBase
 
     [HttpPost]
     [Route("campaigns/{campaignId}/[controller]/attack")]
-    public async Task<ActionResult<ActionResult>> Attack([FromRoute] int campaignId, [FromBody] AttackRequest attack)
+    public async Task<ActionResult<GocActionResult>> Attack([FromRoute] int campaignId, [FromBody] AttackRequest attack)
     {
         var user = this.User.GetGocUser();
         var response = await this.myActionsService.Attack(campaignId, user, attack.TargetTeamId);
@@ -93,7 +92,7 @@ public class ActionsController : ControllerBase
 
     [HttpPost]
     [Route("Campaigns/{campaignId}/[controller]/duel")]
-    public async Task<Microsoft.AspNetCore.Mvc.ActionResult> Duel([FromRoute] int campaignId, [FromBody] DuelRequests duel)
+    public async Task<ActionResult<GocActionResult>> Duel([FromRoute] int campaignId, [FromBody] DuelRequests duel)
     {
         var user = this.User.GetGocUser();
         var response = await this.myActionsService.Duel(campaignId, user, duel.TargetTeamId, duel.GameId, duel.BetCoinks);
@@ -104,7 +103,7 @@ public class ActionsController : ControllerBase
 
     //[HttpPost]
     //[Route("{campaignId}/{missionId}")]
-    //public async Task<ActionResult<EvidencesDto>> FinishMission(IFormFile formFile,
+    //public async Task<GocActionResult<EvidencesDto>> FinishMission(IFormFile formFile,
     //    [FromRoute] int missionId,
     //    [FromRoute] int? campaignId)
     //{

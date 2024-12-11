@@ -9,6 +9,7 @@
 namespace Goc.Business.Contracts;
 
 using System;
+using Goc.Business.Dtos;
 using Goc.Models;
 
 public class Duel
@@ -23,5 +24,5 @@ public class Duel
 
     public int Coinks { get; set; }
 
-    public Membership Oponent { get; set; }
+    public TeamCharacterProfileDto Oponent { get; set; }
 }

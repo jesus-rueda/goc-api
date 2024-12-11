@@ -10,6 +10,8 @@ namespace Goc.Models;
 
 public interface ICampaignProfile
 {
+    public int? CampaignId { get; set; }
+
     public int? MembershipId { get; set; }
         
     public int Id { get; }

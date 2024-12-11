@@ -5,11 +5,14 @@ using System.Collections.Generic;
 
 namespace Goc.Models
 {
+    using Goc.Models.Entities;
+
     public partial class ActionLog
     {
         public ActionLog()
         {
             Evidences = new HashSet<Evidence>();
+            DuelRooms = new HashSet<DuelRoom>();
         }
 
         public long Id { get; set; }
@@ -32,5 +35,7 @@ namespace Goc.Models
 
         
         public virtual ICollection<Evidence> Evidences { get; set; }
+
+        public virtual ICollection<DuelRoom> DuelRooms { get; set; }
     }
 }

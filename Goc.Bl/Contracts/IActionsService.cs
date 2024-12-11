@@ -8,16 +8,16 @@ namespace Goc.Business.Contracts
 {
     public interface IActionsService
     {
-        Task<ActionResult> Attack(int campaignId, ICampaignProfile user, int targetTeamId);
+        Task<GocActionResult> Attack(int campaignId, ICampaignProfile user, int targetTeamId);
 
-        Task<ActionResult> SetupDefence(int campaignId, ICampaignProfile user, byte[] evidence);
+        Task<GocActionResult> SetupDefence(int campaignId, ICampaignProfile user, byte[] evidence);
 
-        Task<ActionResult> AttackDefense(int campaignId, int attackId, ICampaignProfile user, byte[] evidence);
+        Task<GocActionResult> AttackDefense(int campaignId, int attackId, ICampaignProfile user, byte[] evidence);
 
         Task Bonus(int campaignId, ICampaignProfile user, byte[] evidence);
 
-        Task<Duel> Duel(int campaignId, ICampaignProfile user, int duelTargetTeamId, int duelGameId, int duelBetCoinks);
+        Task<Duel> Duel(int campaignId, ICampaignProfile user, int teamId, int duelGameId, int betCoinks);
 
-        Task<ActionResult> FinishMission(int campaignId, int missionId, ICampaignProfile user, byte[] fileBytes);
+        Task<GocActionResult> FinishMission(int campaignId, int missionId, ICampaignProfile user, byte[] fileBytes);
     }
 }

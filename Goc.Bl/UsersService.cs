@@ -21,6 +21,8 @@ public class CampaignProfile : ICampaignProfile
 
     public int? CharacterId { get; set; }
 
+    public int? CampaignId { get; set; }
+
     public int? MembershipId { get; set; }
 
     public int Id { get; set; }
@@ -78,7 +80,8 @@ internal class UsersService : IUserService
 
         ; return new CampaignProfile()
           {
-              MembershipId = membership?.MembershipId,
+              CampaignId = campaignId,
+            MembershipId = membership?.MembershipId,
               Id = user.Id,
               TeamId = membership?.TeamId,
               Upn = user.Upn,

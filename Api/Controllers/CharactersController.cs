@@ -56,7 +56,7 @@ public class CharactersController : ControllerBase
 
     //[HttpGet]
     //[Route("profile")]
-    //public async Task<ActionResult<TeamCharacterProfileDto>> GetProfile()
+    //public async Task<GocActionResult<TeamCharacterProfileDto>> GetProfile()
     //{
     //    var userId = this.User.Identity.Name;
     //    var teamCharacter = await _characterBl.GetProfile(userId);

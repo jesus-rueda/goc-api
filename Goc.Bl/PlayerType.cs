@@ -6,13 +6,17 @@
 //  writing by an officer of ROSEN. All Rights Reserved.
 // </copyright>
 
-namespace Goc.Business.Contracts;
+namespace Goc.Business;
 
-public class ActionResult
+internal enum PlayerType
 {
-    public bool Effective { get; set; }
+    Challenger,
+    Defender
+}
 
-    public int Coinks { get; set; }
-
-    public string Message { get; set; }
+internal enum GameResult
+{
+    ChallengerWin,
+    DefenderWin,
+    Draw
 }

@@ -2,6 +2,8 @@
 
 public class TeamCharacterProfileDto
 {
+
+    public int MembershipId { get; set; }
     public int Id { get; set; }
     public int TeamId { get; set; }
     public string TeamName { get; set; }

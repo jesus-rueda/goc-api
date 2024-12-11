@@ -6,6 +6,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Goc.Models;
 
+using Goc.Models.Entities;
+
 public partial class GocContext : DbContext
 {
     public GocContext()
@@ -18,6 +20,8 @@ public partial class GocContext : DbContext
     {
         
     }
+
+    public virtual DbSet<DuelRoom> DuelRooms { get; set; }
 
     public virtual DbSet<ActionType> ActionTypes { get; set; }
     public virtual DbSet<ActionLog> ActionsLog { get; set; }
@@ -54,6 +58,7 @@ public partial class GocContext : DbContext
                                             //entity.HasOne(d => d.Character);
                                             //entity.HasOne(x => x.Team);
                                         });
+
 
         modelBuilder.Entity<ActionLog>(entity =>
         {
@@ -239,6 +244,19 @@ public partial class GocContext : DbContext
             
 
         });
+
+
+        modelBuilder.Entity<DuelRoom>(
+                                      entity =>
+                                      {
+                                          entity.HasKey(x => x.RoomId);
+                                          entity.Property(x=>x.RoomId).UseIdentityColumn();
+                                          
+
+                                          entity.HasOne(x=>x.ActionLog)
+                                              .WithMany(x => x.DuelRooms);
+                                      });
+
 
         OnModelCreatingPartial(modelBuilder);
     }

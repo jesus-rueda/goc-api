@@ -6,15 +6,13 @@
 //  writing by an officer of ROSEN. All Rights Reserved.
 // </copyright>
 
-namespace Goc.Business;
+namespace Goc.Business.Contracts;
 
-public enum ActionType
+public class GocActionResult
 {
-    CompleteMission = 1,
-    Attack = 2,
-    Defend = 3,
-    Bonus = 4,
-    SetupDefence = 5,
-    DuelChallenge = 6,
-    DuelEnd = 7
+    public bool Effective { get; set; }
+
+    public int Coinks { get; set; }
+
+    public string Message { get; set; }
 }

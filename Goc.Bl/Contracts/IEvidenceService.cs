@@ -9,5 +9,5 @@ using System.IO;
 
 public interface IEvidenceService
 {
-    public Task RegisterAsync(int campaignId, ActionType action, int membershipId, int coinks, TimeSpan duration, int? affectedTeamId = null, int? missionId = null, byte[]? evidence = null);
+    public Task<long> RegisterAsync(int campaignId, ActionType action, int membershipId, int coinks, TimeSpan duration, int? affectedTeamId = null, int? missionId = null, byte[]? evidence = null);
 }

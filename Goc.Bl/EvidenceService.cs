@@ -33,7 +33,7 @@ public class EvidenceService : IEvidenceService
 
     #region Methods
 
-    public async Task RegisterAsync(
+    public async Task<long> RegisterAsync(
         int campaignId,
         ActionType action,
         int membershipId,
@@ -79,6 +79,7 @@ public class EvidenceService : IEvidenceService
         await this.myContext.SaveChangesAsync();
 
         await transaction.CommitAsync();
+        return actionLog.Id;
     }
 
     internal async Task UpdateCoinksBalance(ActionLog log)

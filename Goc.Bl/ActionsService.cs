@@ -11,9 +11,11 @@ namespace Goc.Business;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Goc.Api.Dtos;
 using Goc.Business.Contracts;
 using Goc.Business.Dtos;
 using Goc.Models;
+using Goc.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 
 internal class ActionsService : IActionsService
@@ -32,13 +34,12 @@ internal class ActionsService : IActionsService
 
     private readonly ICampaignService myCampaignService;
 
-   
-
     #endregion
 
     #region Constructors
 
-    public ActionsService(IEvidenceService evidenceService,
+    public ActionsService(
+        IEvidenceService evidenceService,
         ITeamService teamService,
         IMessageService messageService,
         ICampaignService campaignService,
@@ -57,20 +58,17 @@ internal class ActionsService : IActionsService
 
     #region Methods
 
-
     private Task<bool> HaveSetupDefence(int campaignId, int teamId)
     {
-        return this.myContext.ActionsLog
-            .Include(x => x.TeamCharacter)
+        return this.myContext.ActionsLog.Include(x => x.TeamCharacter)
             .AnyAsync(
-                      x => x.TeamCharacter.CampaignId == campaignId                 // this campaign
-                           && x.TeamCharacter.TeamId == teamId &&                           // target team
+                      x => x.TeamCharacter.CampaignId == campaignId // this campaign
+                           && x.TeamCharacter.TeamId == teamId && // target team
                            x.DateTimeFrom <= DateTime.Now && DateTime.Now < x.DateTimeTo && // active
                            x.ActionTypeId == (int)ActionType.SetupDefence);
     }
 
-
-    public async Task<ActionResult> Attack(int campaignId, ICampaignProfile user, int targetTeamId)
+    public async Task<GocActionResult> Attack(int campaignId, ICampaignProfile user, int targetTeamId)
     {
         var attackerTeam = await this.myTeamService.GetAsync(campaignId, user.TeamId!.Value);
         var teamId = user.TeamId!.Value;
@@ -83,27 +81,19 @@ internal class ActionsService : IActionsService
         // available attacks ?
         var parms = await this.myCampaignService.GetParametersFor(campaignId, ActionType.Attack);
 
-        var attacks = await this.myContext.ActionsLog
-            .Include(x => x.TeamCharacter)
+        var attacks = await this.myContext.ActionsLog.Include(x => x.TeamCharacter)
             .CountAsync(
-                        x => x.TeamCharacter.CampaignId == campaignId                 // this campaign
-                             && x.TeamCharacterId == user.MembershipId &&                           // target team
+                        x => x.TeamCharacter.CampaignId == campaignId // this campaign
+                             && x.TeamCharacterId == user.MembershipId && // target team
                              x.ActionTypeId == (int)ActionType.Attack);
 
-        if(attacks >= parms.MaxAllowed)
+        if (attacks >= parms.MaxAllowed)
         {
-            return new ActionResult()
-            {
-                Effective = false,
-                Message = "No more attacks available for user"
-            };
+            return new GocActionResult() { Effective = false, Message = "No more attacks available for user" };
         }
-
 
         // have setup a prev defence ?
         var isAffectedTeamDefended = await this.HaveSetupDefence(campaignId, teamId);
-
-        
 
         // send messages
         if (isAffectedTeamDefended)
@@ -134,59 +124,43 @@ internal class ActionsService : IActionsService
                                                   });
         }
 
-        
+        var result = new GocActionResult()
+                     {
+                         Effective = !isAffectedTeamDefended, Message = "Attack was successfully", Coinks = isAffectedTeamDefended ? 0 : parms.Coinks
+                     };
 
-        var result = new ActionResult()
-        {
-            Effective = !isAffectedTeamDefended,
-            Message = "Attack was successfully",
-            Coinks = isAffectedTeamDefended ? 0 : parms.Coinks
-        };
-
-        await this.myEvidenceService.RegisterAsync(campaignId, ActionType.Attack, user.MembershipId!.Value, result.Coinks, parms.Duration,   targetTeamId);
+        await this.myEvidenceService.RegisterAsync(campaignId, ActionType.Attack, user.MembershipId!.Value, result.Coinks, parms.Duration, targetTeamId);
         return result;
     }
 
-    public async Task<ActionResult> SetupDefence(int campaignId, ICampaignProfile user, byte[] evidence)
+    public async Task<GocActionResult> SetupDefence(int campaignId, ICampaignProfile user, byte[] evidence)
     {
-       var parms = await this.myCampaignService.GetParametersFor(campaignId, ActionType.Attack);
+        var parms = await this.myCampaignService.GetParametersFor(campaignId, ActionType.Attack);
 
         // still have defense available in campaign ?
-        var defencesUsed=  await this.myContext.ActionsLog
-            .Include(x => x.TeamCharacter)
+        var defencesUsed = await this.myContext.ActionsLog.Include(x => x.TeamCharacter)
             .CountAsync(
-                      x => x.TeamCharacter.CampaignId == campaignId                 // this campaign
-                           && x.TeamCharacterId == user.MembershipId
-                           && x.ActionTypeId == (int)ActionType.SetupDefence);
-        
-
+                        x => x.TeamCharacter.CampaignId == campaignId // this campaign
+                             && x.TeamCharacterId == user.MembershipId && x.ActionTypeId == (int)ActionType.SetupDefence);
 
         if (defencesUsed >= parms.MaxAllowed)
         {
-            return new ActionResult() { Message = "No more defences available for user", Coinks = 0, Effective = false };
+            return new GocActionResult() { Message = "No more defences available for user", Coinks = 0, Effective = false };
         }
 
         // already have defense ?
         var isAffectedTeamDefended = await this.HaveSetupDefence(campaignId, user.TeamId!.Value);
         if (isAffectedTeamDefended)
         {
-            return new ActionResult()
-                   {
-                       Effective = false,
-                       Message = "Team already have a defence prepared"
-                   };
+            return new GocActionResult() { Effective = false, Message = "Team already have a defence prepared" };
         }
 
         // all ok, setup defence
         await this.myEvidenceService.RegisterAsync(campaignId, ActionType.SetupDefence, user.MembershipId!.Value, parms.Coinks, parms.Duration);
-        return new ActionResult()
-        {
-            Effective = true,
-            Message = "AttackDefense prepared"
-        };
+        return new GocActionResult() { Effective = true, Message = "AttackDefense prepared" };
     }
 
-    public Task<ActionResult> AttackDefense(int campaignId, int attackId, ICampaignProfile user, byte[] evidence)
+    public Task<GocActionResult> AttackDefense(int campaignId, int attackId, ICampaignProfile user, byte[] evidence)
     {
         throw new NotImplementedException();
     }
@@ -196,40 +170,139 @@ internal class ActionsService : IActionsService
         throw new NotImplementedException();
     }
 
-    public Task<Duel> Duel(int campaignId, ICampaignProfile user, int duelTargetTeamId, int duelGameId, int duelBetCoinks)
+
+
+    public async Task<GocActionResult> FinishGame(int roomId, string gameState, GameResult result, ICampaignProfile user)
+    {
+        var campaignId = user.CampaignId!.Value;
+        var parms = await this.myCampaignService.GetParametersFor(campaignId, ActionType.DuelChallenge);
+        var room = await this.myContext.DuelRooms.FindAsync(roomId);
+        if (room == null)
+        {
+            return new GocActionResult() { Effective = false, Message = "Room not found" };
+        }
+
+        room.GameState = gameState;
+        room.Result = result.ToString();
+        room.NextTurn = null;
+
+        var challenger = await this.myContext.Memberships.FindAsync(room.ChallengerId);
+        var defender = await this.myContext.Memberships.FindAsync(room.DefenderId);
+        var winner = challenger;
+        var loser = defender;
+        
+        switch (result)
+        {
+            case GameResult.DefenderWin:
+                (winner, loser) = (loser, winner);
+                break;
+            case GameResult.Draw:
+                winner = null;
+                loser = null;
+                break;
+        }
+
+        // register the duel end and coinks balance
+        await this.myEvidenceService.RegisterAsync(campaignId,
+                                                   ActionType.DuelEnd,
+                                                   winner?.MembershipId ?? user.MembershipId!.Value,
+                                                   room.Bet,
+                                                   parms.Duration,
+                                                   affectedTeamId: loser?.MembershipId);
+
+        await this.myContext.SaveChangesAsync();
+        return new GocActionResult() { Coinks = room.Bet, Effective = true, Message = "Game completed" };
+    }
+
+    public async Task<Duel> GetTurnData(int roomId, ICampaignProfile user)
     {
         throw new NotImplementedException();
     }
 
-    public async Task<ActionResult> FinishMission(int campaignId, int missionId, ICampaignProfile user, byte[] fileBytes)
+    public async Task<Duel> NextTurn(int roomId, string gameState, ICampaignProfile user)
+    {
+        throw new NotImplementedException();
+    }
+
+    public async Task<Duel> Duel(int campaignId, ICampaignProfile user, int teamId, int duelGameId, int betCoinks)
+    {
+        var parms = await this.myCampaignService.GetParametersFor(campaignId, ActionType.DuelChallenge);
+        var logId = await this.myEvidenceService.RegisterAsync(campaignId, ActionType.DuelChallenge, user.MembershipId!.Value, 0, parms.Duration);
+
+        var defenderTeam = await this.myTeamService.GetAsync(campaignId, teamId);
+        var challengerTeam = await this.myTeamService.GetAsync(campaignId, user.TeamId!.Value);
+
+        var random = new Random();
+        var defender = defenderTeam.Members.ElementAt(random.Next(defenderTeam.Members.Count()));
+
+        betCoinks = Math.Min(betCoinks, challengerTeam.Coinks);
+        betCoinks = Math.Min(betCoinks, defenderTeam.Coinks);
+
+
+        if(betCoinks < parms.Coinks)
+        {
+            return new Duel() { Effective = false, Message = $"Min bet can be {parms.Coinks}" };
+        }
+
+        if (betCoinks > parms.MaxAllowed)
+        {
+            return new Duel() { Effective = false, Message = $"Max bet can be {parms.MaxAllowed}" };
+        }
+
+        var room = new DuelRoom()
+                   {
+                       ActionLogId = logId,
+                       Bet = betCoinks,
+                       GameId = duelGameId.ToString(),
+                       ChallengerId = user.MembershipId!.Value,
+                       DefenderId = defender.MembershipId,
+                       NextTurn = PlayerType.Challenger.ToString(),
+                       Rounds = 3
+                   };
+
+        this.myContext.DuelRooms.Add(room);
+        await this.myContext.SaveChangesAsync();
+
+        var duel = new Duel
+                   {
+                       Coinks = betCoinks,
+                       Deadline = DateTime.Now.Add(parms.Duration),
+                       Effective = true,
+                       Id = room.RoomId,
+                       Oponent = defender
+                   };
+
+        return duel;
+    }
+
+    public async Task<GocActionResult> FinishMission(int campaignId, int missionId, ICampaignProfile user, byte[] fileBytes)
     {
         // still open?
         var mission = await this.myMissionService.GetAsync(campaignId, missionId);
         if (mission.StartDate > DateTime.Now || DateTime.Now > mission.EndDate)
         {
-            return new ActionResult() { Effective = false, Message = "Mission is not active", };
+            return new GocActionResult() { Effective = false, Message = "Mission is not active" };
         }
 
-        var actions = await this.myContext.ActionsLog
-            .Include(x => x.TeamCharacter)
+        var actions = await this.myContext.ActionsLog.Include(x => x.TeamCharacter)
             .Include(x => x.Evidences)
-            .Where(x => x.TeamCharacter.TeamId == user.TeamId && x.MissionId == missionId && x.ActionTypeId == (int)ActionType.CompleteMission && x.Evidences.Any(e => e.IsValid))
+            .Where(
+                   x => x.TeamCharacter.TeamId == user.TeamId && x.MissionId == missionId && x.ActionTypeId == (int)ActionType.CompleteMission
+                        && x.Evidences.Any(e => e.IsValid))
             .Select(x => new { UserId = x.TeamCharacter.UserId })
             .ToListAsync();
-
 
         // im not already finished this mission ?
         if (actions.Any(x => x.UserId == user.Id))
         {
-            return new ActionResult() { Effective = false, Message = "Mission already complete for this user" };
+            return new GocActionResult() { Effective = false, Message = "Mission already complete for this user" };
         }
 
-        var membersCount = await this.myContext.Memberships
-            .Where(x => x.TeamId == user.TeamId && x.CampaignId == campaignId)
+        var membersCount = await this.myContext.Memberships.Where(x => x.TeamId == user.TeamId && x.CampaignId == campaignId)
             .CountAsync();
 
         var coinks = 0;
-        if ((actions.Count + 1) == membersCount)
+        if (actions.Count + 1 == membersCount)
         {
             // all members finished the mission, last one increments coinks
             coinks = mission.Coinks;
@@ -237,8 +310,15 @@ internal class ActionsService : IActionsService
 
         var parms = await this.myCampaignService.GetParametersFor(campaignId, ActionType.CompleteMission);
 
-        await this.myEvidenceService.RegisterAsync(campaignId, ActionType.CompleteMission, user.MembershipId!.Value, coinks, parms.Duration, missionId: missionId, evidence: fileBytes);
-        return new ActionResult() { Effective = true, Coinks = coinks, Message = "Mission completed" };
+        await this.myEvidenceService.RegisterAsync(
+                                                   campaignId,
+                                                   ActionType.CompleteMission,
+                                                   user.MembershipId!.Value,
+                                                   coinks,
+                                                   parms.Duration,
+                                                   missionId: missionId,
+                                                   evidence: fileBytes);
+        return new GocActionResult() { Effective = true, Coinks = coinks, Message = "Mission completed" };
     }
 
     #endregion
