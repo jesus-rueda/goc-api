@@ -93,6 +93,7 @@ public class TeamService : ITeamService
             .Include(x=>x.Team)
             .Where(x => x.CampaignId == campaignId)
             .Select(x=>x.Team)
+            .Distinct()
             .ToListAsync();
 
         return teams.Select(x => x.ToDto())
