@@ -7,21 +7,21 @@ namespace Goc.Business.Extensions;
 
 public static class MapDtoExtensions
 {
-    public static MissionsDto ToDto(this Mission mission)
+    public static MissionsDto ToDto(this MissionCampaign mission)
     {
         return new MissionsDto
         {
-            Id = mission.Id,
-            Name = mission.Name,
-            Story = mission.Story,
-            Instructions = mission.Instructions,
-            Coinks = mission.Coinks,
+            Id = mission.Mission.Id,
+            Name = mission.Mission.Name,
+            Story = mission.Mission.Story,
+            Instructions = mission.Mission.Instructions,
+            Coinks = mission.Mission.Coinks,
             StartDate = mission.StartDate,
             EndDate = mission.EndDate
         };
     }
 
-    public static List<MissionsDto> ToDto(this List<Mission> mission)
+    public static List<MissionsDto> ToDto(this List<MissionCampaign> mission)
     {
         return mission.Select(m => m.ToDto()).ToList();
     }

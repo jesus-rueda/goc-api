@@ -64,20 +64,4 @@ namespace Goc.Models
 
         public virtual Team? Team { get; set; }
     }
-
-    public interface ICampaingProfile
-    {
-        
-        public int Id { get; }
-        
-        public int? TeamId { get;  }
-        
-        public int? CharacterId { get;  }
-        
-        public string Upn { get;  }
-
-        public bool IsLeader { get; }
-
-        public bool IsAdmin { get;  }
-    }
 }

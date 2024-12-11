@@ -6,32 +6,42 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Goc.Api.Controllers;
 
+using System;
 using Microsoft.AspNetCore.Authorization;
 
 [ApiController]
 [Authorize]
-[Route("api/[controller]")]
-public class MissionsController
+[Route("/api/Campaigns/{campaignId}/[controller]")]
+public class MissionsController: ControllerBase
 {
-    private readonly IMissionBl _missionBl;
+    private readonly IMissionService myMissionService;
 
-    public MissionsController(IMissionBl missionBl)
+    public MissionsController(IMissionService missionService)
     {
-        _missionBl = missionBl;
+        this.myMissionService = missionService;
     }
 
     [HttpGet]
     [Route("{id}")]
-    public async Task<ActionResult<MissionsDto>> Get(int id)
+    public async Task<ActionResult<MissionsDto>> Get(
+        [FromRoute] int id,
+        [FromRoute] int campaignId)
     {
-        var missions = await _missionBl.GetAsync(id);
-
+        var missions = await this.myMissionService.GetAsync(campaignId, id);
         return missions;
     }
 
-    [HttpGet("/api/campaigns/{campaignId}/missions")]
+    [HttpGet]
     public async Task<ActionResult<List<MissionsDto>>> GetCampaignMissions(int campaignId)
     {
-        return await _missionBl.GetCampaignMissionsAsync(campaignId);
+        try
+        {
+            return await this.myMissionService.GetCampaignMissionsAsync(campaignId);
+        }
+        catch(Exception ex)
+        {
+            return this.Problem(ex.Message);
+        }
+        
     }
 }

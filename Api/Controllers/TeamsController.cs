@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using ActionResult = Microsoft.AspNetCore.Mvc.ActionResult;
 
 [ApiController]
 [Authorize]
@@ -46,16 +47,16 @@ public class TeamsController : ControllerBase
 
     [HttpPost]
     [Authorize(Roles = "leader")]
-    [Route("[controller]/{teamId}/joins/aprovals")]
-    public async Task<ActionResult> Aprove(int teamId, AproveJoinRequests request)
+    [Route("[controller]/{teamId}/joins/approvals")]
+    public async Task<ActionResult> Approve(int teamId, AproveJoinRequests request)
     {
-        return await Aprove(null, teamId, request);
+        return await this.Approve(null, teamId, request);
     }
 
     [HttpPost]
     [Authorize(Roles = "leader")]
-    [Route("Campaigns/{campaignId}/[controller]/{teamId}/joins/aprovals")]
-    public async Task<ActionResult> Aprove(
+    [Route("Campaigns/{campaignId}/[controller]/{teamId}/joins/approvals")]
+    public async Task<ActionResult> Approve(
         [FromRoute] int? campaignId,
         [FromRoute] int teamId, AproveJoinRequests request)
     {
@@ -110,7 +111,8 @@ public class TeamsController : ControllerBase
     [Route("[controller]/{teamId}")]
     public async Task<ActionResult<TeamDto>> Get(int teamId)
     {
-        var team = await this.myTeamService.GetAsync(teamId);
+        var campaignId = await this.myCampaignService.GetActive();
+        var team = await this.myTeamService.GetAsync(campaignId.Id, teamId);
         if (team == null)
         {
             return this.NotFound();
@@ -123,7 +125,8 @@ public class TeamsController : ControllerBase
     [Route("[controller]")]
     public async Task<ActionResult<List<TeamDto>>> GetAllTeams()
     {
-        var teams = await this.myTeamService.GetAllAsync();
+        var campaign = await this.myCampaignService.GetActive();
+        var teams = await this.myTeamService.GetAllAsync(campaign.Id);
         return teams;
     }
 

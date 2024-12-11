@@ -84,7 +84,7 @@ authValidator = async context =>
 {
     await using var scope = app.Services.CreateAsyncScope();
     var users = scope.ServiceProvider.GetService<IUserService>();
-    var user = await users.GetByUpn(context.Principal.Identity.Name);
+    var user = await users.GetProfileByUpn(context.Principal.Identity.Name);
     if (user == null)
     {
         return;

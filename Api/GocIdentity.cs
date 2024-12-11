@@ -14,7 +14,7 @@ using Goc.Models;
 
 public static class ClaimsPrincipalExtensions
 {
-    public static ICampaingProfile GetGocUser(this ClaimsPrincipal principal)
+    public static ICampaignProfile GetGocUser(this ClaimsPrincipal principal)
     {
         return principal.Identities.OfType<GocIdentity>().FirstOrDefault()?.User;
     }
@@ -22,8 +22,8 @@ public static class ClaimsPrincipalExtensions
 
 public class GocIdentity : ClaimsIdentity
 {
-    public ICampaingProfile User { get; }
-    public GocIdentity(ICampaingProfile user, List<Claim> claims):base(claims)
+    public ICampaignProfile User { get; }
+    public GocIdentity(ICampaignProfile user, List<Claim> claims):base(claims)
     {
         this.User = user;
     }
