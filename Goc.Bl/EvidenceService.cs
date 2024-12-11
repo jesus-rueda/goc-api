@@ -62,6 +62,7 @@ public class EvidenceService : IEvidenceService
 
         if (evidence != null)
         {
+            await this.myContext.SaveChangesAsync();
             var ev = new Evidence()
             {
                 ActionLogId = actionLog.Id,
