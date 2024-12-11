@@ -33,7 +33,7 @@ builder.Services.AddCors(
         "CorsPolicy",
         builder =>
         {
-            builder.WithOrigins("http://localhost:4200", "https://purple-cliff-03edabc0f.3.azurestaticapps.net").AllowAnyHeader().AllowAnyMethod()
+            builder.WithOrigins("https://localhost:4200", "http://localhost:4200", "https://purple-cliff-03edabc0f.3.azurestaticapps.net").AllowAnyHeader().AllowAnyMethod()
                 .AllowCredentials();
         }));
 
@@ -77,6 +77,8 @@ options =>
     options.ExpireTimeSpan = TimeSpan.FromDays(1);
     options.SlidingExpiration = true;
 });
+
+builder.Services.AddSingleton<DuelService>();
 
 var app = builder.Build();
 
@@ -139,5 +141,6 @@ app.UseAuthorization();
 
 app.MapControllers();
 app.MapHub<NotificationHub>("/Notification");
+app.MapHub<GameHub>("/Game");
 
 app.Run();
