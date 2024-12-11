@@ -89,12 +89,11 @@ public class TeamService : ITeamService
 
     public async Task<List<TeamDto>> GetAllAsync(int campaignId)
     {
-        var teams = await this._context.Memberships
-            .Include(x=>x.Team)
-            .Where(x => x.CampaignId == campaignId)
-            .Select(x=>x.Team)
-            .Distinct()
+        var teams = await this._context.Teams
+            .Include(x=>x.TeamsCharacters.Where(x=>x.CampaignId == campaignId))
+            .ThenInclude(x=>x.User)
             .ToListAsync();
+
 
         return teams.Select(x => x.ToDto())
             .ToList();
@@ -102,11 +101,10 @@ public class TeamService : ITeamService
 
     public async Task<TeamDto> GetAsync(int campaignId, int id)
     {
-        var team = await this._context.Memberships.Include(x => x.User)
-            .Include(x => x.Team)
-            .Where(x => x.TeamId == id && x.CampaignId == campaignId)
-            .Select(x => x.Team)
-            .FirstOrDefaultAsync();
+        var team = await this._context.Teams
+            .Include(x => x.TeamsCharacters.Where(x=>x.CampaignId == campaignId))
+            .ThenInclude(x=>x.User)
+            .FirstOrDefaultAsync(x=>x.Id == id);
             
 
         var dto = team.ToDto();
