@@ -184,7 +184,7 @@ internal class ActionsService : IActionsService
 
         room.GameState = gameState;
         room.Result = result.ToString();
-        room.NextTurn = null;
+        room.CurrentTurn = null;
 
         var challenger = await this.myContext.Memberships.FindAsync(room.ChallengerId);
         var defender = await this.myContext.Memberships.FindAsync(room.DefenderId);
@@ -214,17 +214,77 @@ internal class ActionsService : IActionsService
         return new GocActionResult() { Coinks = room.Bet, Effective = true, Message = "Game completed" };
     }
 
-    public async Task<Duel> GetTurnData(int roomId, ICampaignProfile user)
-    {
-        throw new NotImplementedException();
+    public async Task<DuelAction> GetTurnData(int roomId, ICampaignProfile user)
+    {   
+        var  room =  await this.myContext.DuelRooms
+            .Include(x=>x.ActionLog)
+            .Where(x => x.RoomId == roomId)
+            .FirstOrDefaultAsync();
+
+        if(room.ChallengerId != user.MembershipId && room.DefenderId != user.MembershipId)
+        {
+            return new DuelAction() { Effective = false, Message = "User not in the room" };
+        }
+
+        var isMyTurn = room.CurrentTurn == PlayerType.Challenger.ToString() && room.ChallengerId == user.MembershipId
+                      || room.CurrentTurn == PlayerType.Defender.ToString() && room.DefenderId == user.MembershipId;
+
+
+        var duel = new DuelAction()
+                         {
+                             Id = room.RoomId,
+                             Coinks = room.Bet,
+                             GameState = room.GameState,
+                             GameId = room.GameId,
+                             IsMyTurn = isMyTurn,
+                             Deadline = room.ActionLog.DateTimeTo,
+                             Effective = true,
+                         };
+
+            return duel;
     }
 
-    public async Task<Duel> NextTurn(int roomId, string gameState, ICampaignProfile user)
+    public async Task<DuelAction> EndTurn(int roomId, string gameState, ICampaignProfile user)
     {
-        throw new NotImplementedException();
+        var room = await this.myContext.DuelRooms
+            .Include(x => x.ActionLog)
+            .Where(x => x.RoomId == roomId)
+            .FirstOrDefaultAsync();
+
+        if (room.ChallengerId != user.MembershipId && room.DefenderId != user.MembershipId)
+        {
+            return new DuelAction() { Effective = false, Message = "User not in the room" };
+        }
+
+        var isMyTurn = room.CurrentTurn == PlayerType.Challenger.ToString() && room.ChallengerId == user.MembershipId
+                       || room.CurrentTurn == PlayerType.Defender.ToString() && room.DefenderId == user.MembershipId;
+
+
+        if (!isMyTurn)
+        {
+            return new DuelAction() { Effective = false, Message = "Not you turn" };
+        }
+
+        room.GameState = gameState;
+        room.CurrentTurn = room.CurrentTurn == PlayerType.Challenger.ToString() ? PlayerType.Defender.ToString() : PlayerType.Challenger.ToString();
+        this.myContext.DuelRooms.Update(room);
+        await this.myContext.SaveChangesAsync();
+
+        var duel = new DuelAction()
+                   {
+                       Id = room.RoomId,
+                       Coinks = room.Bet,
+                       GameState = room.GameState,
+                       GameId = room.GameId,
+                       IsMyTurn = false,
+                       Deadline = room.ActionLog.DateTimeTo,
+                       Effective = true,
+                   };
+
+        return duel;
     }
 
-    public async Task<Duel> Duel(int campaignId, ICampaignProfile user, int teamId, int duelGameId, int betCoinks)
+    public async Task<DuelAction> Duel(int campaignId, ICampaignProfile user, int teamId, int duelGameId, int betCoinks)
     {
         var parms = await this.myCampaignService.GetParametersFor(campaignId, ActionType.DuelChallenge);
         var logId = await this.myEvidenceService.RegisterAsync(campaignId, ActionType.DuelChallenge, user.MembershipId!.Value, 0, parms.Duration);
@@ -241,12 +301,12 @@ internal class ActionsService : IActionsService
 
         if(betCoinks < parms.Coinks)
         {
-            return new Duel() { Effective = false, Message = $"Min bet can be {parms.Coinks}" };
+            return new DuelAction() { Effective = false, Message = $"Min bet can be {parms.Coinks}" };
         }
 
         if (betCoinks > parms.MaxAllowed)
         {
-            return new Duel() { Effective = false, Message = $"Max bet can be {parms.MaxAllowed}" };
+            return new DuelAction() { Effective = false, Message = $"Max bet can be {parms.MaxAllowed}" };
         }
 
         var room = new DuelRoom()
@@ -256,14 +316,14 @@ internal class ActionsService : IActionsService
                        GameId = duelGameId.ToString(),
                        ChallengerId = user.MembershipId!.Value,
                        DefenderId = defender.MembershipId,
-                       NextTurn = PlayerType.Challenger.ToString(),
+                       CurrentTurn = PlayerType.Challenger.ToString(),
                        Rounds = 3
                    };
 
         this.myContext.DuelRooms.Add(room);
         await this.myContext.SaveChangesAsync();
 
-        var duel = new Duel
+        var duel = new DuelAction
                    {
                        Coinks = betCoinks,
                        Deadline = DateTime.Now.Add(parms.Duration),

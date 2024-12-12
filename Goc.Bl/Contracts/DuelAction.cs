@@ -12,7 +12,7 @@ using System;
 using Goc.Business.Dtos;
 using Goc.Models;
 
-public class Duel
+public class DuelAction
 {
     public int Id { get; set; }
 
@@ -25,4 +25,10 @@ public class Duel
     public int Coinks { get; set; }
 
     public TeamCharacterProfileDto Oponent { get; set; }
+
+    public string GameState { get; set; }
+
+    public string GameId { get; set; }
+
+    public bool IsMyTurn { get; set; }
 }

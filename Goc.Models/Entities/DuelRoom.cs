@@ -27,7 +27,7 @@ namespace Goc.Models.Entities
 
         public string GameState { get; set; }
 
-        public string NextTurn { get; set; }
+        public string CurrentTurn { get; set; }
 
         public string Result { get; set; }
 

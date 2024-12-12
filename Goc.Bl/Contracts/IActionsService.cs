@@ -16,7 +16,7 @@ namespace Goc.Business.Contracts
 
         Task Bonus(int campaignId, ICampaignProfile user, byte[] evidence);
 
-        Task<Duel> Duel(int campaignId, ICampaignProfile user, int teamId, int duelGameId, int betCoinks);
+        Task<DuelAction> Duel(int campaignId, ICampaignProfile user, int teamId, int duelGameId, int betCoinks);
 
         Task<GocActionResult> FinishMission(int campaignId, int missionId, ICampaignProfile user, byte[] fileBytes);
     }
