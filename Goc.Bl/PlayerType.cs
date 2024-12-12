@@ -14,7 +14,7 @@ internal enum PlayerType
     Defender
 }
 
-internal enum GameResult
+public enum GameResult
 {
     ChallengerWin,
     DefenderWin,
