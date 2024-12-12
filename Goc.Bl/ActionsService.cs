@@ -184,6 +184,11 @@ internal class ActionsService : IActionsService
             return new DuelAction() { Effective = false, Message = "Room not found" };
         }
 
+        if(room.Result != null)
+        {
+            return new DuelAction() { Effective = false, Message = "Game already completed" };
+        }
+
         room.GameState = gameState;
         room.CurrentTurn = null;
 
@@ -305,6 +310,12 @@ internal class ActionsService : IActionsService
             return new DuelAction() { Effective = false, Message = "User not in the room" };
         }
 
+        if(room.Result != null)
+        {
+            return new DuelAction() { Effective = false, Message = "Game already completed" };
+        }
+
+
         var isMyTurn = room.CurrentTurn == PlayerType.Challenger.ToString() && room.ChallengerId == user.MembershipId
                        || room.CurrentTurn == PlayerType.Defender.ToString() && room.DefenderId == user.MembershipId;
 
@@ -340,7 +351,7 @@ internal class ActionsService : IActionsService
 
 
         var duels =await  this.myContext.ActionsLog.Include(x => x.TeamCharacter)
-            .Where(x => x.TeamCharacter.CampaignId == campaignId && x.TeamCharacterId == user.MembershipId)
+            .Where(x => x.TeamCharacter.CampaignId == campaignId && x.TeamCharacterId == user.MembershipId && x.ActionTypeId == (int)ActionType.DuelChallenge)
             .CountAsync();
 
         if (duels >= parms.MaxAllowed)
