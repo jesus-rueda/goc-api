@@ -17,6 +17,7 @@ using Goc.Business.Dtos;
 using Goc.Models;
 using Goc.Models.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 
 internal class ActionsService : IActionsService
 {
@@ -172,7 +173,7 @@ internal class ActionsService : IActionsService
 
 
 
-    public async Task<GocActionResult> FinishGame(int roomId, string gameState, GameResult result, ICampaignProfile user)
+    public async Task<GocActionResult> FinishGame(int roomId, string gameState, PlayerGameResult result, ICampaignProfile user)
     {
         var campaignId = user.CampaignId!.Value;
         var parms = await this.myCampaignService.GetParametersFor(campaignId, ActionType.DuelChallenge);
@@ -188,17 +189,25 @@ internal class ActionsService : IActionsService
 
         var challenger = await this.myContext.Memberships.FindAsync(room.ChallengerId);
         var defender = await this.myContext.Memberships.FindAsync(room.DefenderId);
+
+        var imChallenger = challenger.MembershipId == user.MembershipId;
+
         var winner = challenger;
         var loser = defender;
-        
+        var coinks = room.Bet;
+
         switch (result)
         {
-            case GameResult.DefenderWin:
-                (winner, loser) = (loser, winner);
+            case PlayerGameResult.Lose:
+
                 break;
-            case GameResult.Draw:
+            case PlayerGameResult.Win:
+                //(winner, loser) = (loser, winner);
+                break;
+            case PlayerGameResult.Draw:
                 winner = null;
                 loser = null;
+                coinks = 0;
                 break;
         }
 
@@ -206,7 +215,7 @@ internal class ActionsService : IActionsService
         await this.myEvidenceService.RegisterAsync(campaignId,
                                                    ActionType.DuelEnd,
                                                    winner?.MembershipId ?? user.MembershipId!.Value,
-                                                   room.Bet,
+                                                   coinks,
                                                    parms.Duration,
                                                    affectedTeamId: loser?.MembershipId);
 
@@ -221,10 +230,17 @@ internal class ActionsService : IActionsService
             .Where(x => x.RoomId == roomId)
             .FirstOrDefaultAsync();
 
-        if(room.ChallengerId != user.MembershipId && room.DefenderId != user.MembershipId)
+
+        var challenger = await this.myContext.Memberships.FindAsync(room.ChallengerId);
+        var defender = await this.myContext.Memberships.FindAsync(room.DefenderId);
+
+        
+        if (room.ChallengerId != user.MembershipId && room.DefenderId != user.MembershipId)
         {
             return new DuelAction() { Effective = false, Message = "User not in the room" };
         }
+
+
 
         var isMyTurn = room.CurrentTurn == PlayerType.Challenger.ToString() && room.ChallengerId == user.MembershipId
                       || room.CurrentTurn == PlayerType.Defender.ToString() && room.DefenderId == user.MembershipId;
@@ -236,7 +252,6 @@ internal class ActionsService : IActionsService
                              Coinks = room.Bet,
                              GameState = room.GameState,
                              GameId = room.GameId,
-                             IsMyTurn = isMyTurn,
                              Deadline = room.ActionLog.DateTimeTo,
                              Effective = true,
                          };

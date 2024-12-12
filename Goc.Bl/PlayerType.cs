@@ -20,3 +20,11 @@ public enum GameResult
     DefenderWin,
     Draw
 }
+
+
+public enum PlayerGameResult
+{
+    Win = 0,
+    Lose = 1,
+    Draw = 2
+}

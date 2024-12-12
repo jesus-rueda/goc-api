@@ -29,6 +29,7 @@ public class CampaignProfile : ICampaignProfile
 
     public bool IsAdmin { get; set; }
 
+
     public bool IsLeader { get; set; }
 
     public int? TeamId { get; set; }
@@ -60,6 +61,25 @@ internal class UsersService : IUserService
 
     #region Methods
 
+    public async Task<ICampaignProfile> GetProfileByMemberId(int memberId)
+    {
+        var membership = await this.myContext.Memberships
+            .Include(x=>x.User)
+            .FirstOrDefaultAsync(x=>x.MembershipId == memberId);
+
+        ; return new CampaignProfile()
+                 {
+                     CampaignId = membership.CampaignId,
+                     MembershipId = membership?.MembershipId,
+                     Id = membership.User.Id,
+                     TeamId = membership?.TeamId,
+                     Upn = membership.User.Upn,
+                     CharacterId = membership?.CharacterId,
+                     IsAdmin = membership.User.IsAdmin,
+                     IsLeader = membership?.IsLeader ?? false
+                 };
+    }
+
     public async Task AutoRegisterUser(string upn)
     {
         var iuser = await this.GetProfileByUpn(upn); // hate this
@@ -88,7 +108,6 @@ internal class UsersService : IUserService
               CharacterId = membership?.CharacterId,
               IsAdmin = user.IsAdmin,
               IsLeader = membership?.IsLeader ?? false
-
           };
     }
 

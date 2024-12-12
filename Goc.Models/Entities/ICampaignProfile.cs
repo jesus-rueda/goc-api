@@ -25,6 +25,4 @@ public interface ICampaignProfile
     public bool IsLeader { get; }
 
     public bool IsAdmin { get;  }
-
-     
 }

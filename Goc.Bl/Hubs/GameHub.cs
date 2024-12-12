@@ -41,16 +41,20 @@ namespace Goc.Business.Hubs
         public async Task JoinRoom(int roomName, string user)
         {
             await Groups.AddToGroupAsync(Context.ConnectionId, roomName.ToString());
-            var profile = await myUserService.GetProfileByUpn(user);
-
             
-            var duelAction = await myActionsService.GetDuelTurnData(roomName, profile);
+            var profile = await this.myUserService.GetProfileByUpn(user);
+            var duelAction = await this.myActionsService.GetDuelTurnData(roomName, profile);
 
-            if(duelAction.IsMyTurn)
-            {
-                await Clients.Group(roomName.ToString()).SendAsync("SystemMessage", duelAction);
-                await Clients.Group(roomName.ToString()).SendAsync("NextTurnMessage", "$characterTurn", duelAction.GameState);
-            }
+
+            await this.Clients.Group(roomName.ToString()).SendAsync("userJoinRoom", new
+                                                                                     {
+                                                                                         MembershipId = profile.MembershipId, 
+                                                                                         CharacterId = profile.CharacterId, 
+                                                                                         Upn = profile.Upn,
+                                                                                      });
+
+            await this.Clients.Group(roomName.ToString()).SendAsync("NextTurnMessage", new { duelAction.CurrentTurnMemberId, duelAction.GameState });
+            
 
             //var duel = this.myDualService.duelList.Find(d => d.RoomName == roomName);
             //if (duel != null)
@@ -80,10 +84,10 @@ namespace Goc.Business.Hubs
             await Clients.Group(roomName.ToString()).SendAsync("ReceiveChoice", user, choice);
         }
 
-        public async Task FinishDuel(int roomName, string user, DuelAction duel, GameResult gameResult)
+        public async Task FinishDuel(int roomName, int memberId, PlayerGameResult result)
         {
-            var profile = await myUserService.GetProfileByUpn(user);
-            await myActionsService.FinishGame(roomName, duel.GameState, gameResult, profile);
+            var profile = await myUserService.GetProfileByMemberId(memberId);
+            await myActionsService.FinishGame(roomName, null, result, profile);
         }
     }
 }
