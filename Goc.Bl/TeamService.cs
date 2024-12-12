@@ -179,10 +179,20 @@ public class TeamService : ITeamService
         var defends = await this._context.ActionsLog.Include(x => x.TeamCharacter)
             .CountAsync(a => a.TeamCharacter.UserId == userId && a.TeamCharacter.CampaignId == campaignId && a.ActionTypeId == (int)ActionType.SetupDefence);
 
+        var duels = await this._context.ActionsLog.Include(x => x.TeamCharacter)
+            .CountAsync(a => a.TeamCharacter.UserId == userId && a.TeamCharacter.CampaignId == campaignId && a.ActionTypeId == (int)ActionType.DuelChallenge);
+
+        
         var attackPars = await this.myCampaignService.GetParametersFor(campaignId, ActionType.Attack);
         var deffensePars = await this.myCampaignService.GetParametersFor(campaignId, ActionType.SetupDefence);
+        var duelsPars = await this.myCampaignService.GetParametersFor(campaignId, ActionType.DuelChallenge);
 
-        return new TeamMemberStats { AttacksDone = attacks, AttacksTotal = attackPars.MaxAllowed ?? 0, DefensesTotal = deffensePars.MaxAllowed ?? 0, DefensesUsed = defends };
+        return new TeamMemberStats
+               {
+                   DuelsUsed = duels,
+                   DuelsTotal = duelsPars.MaxAllowed,
+                   AttacksDone = attacks, AttacksTotal = attackPars.MaxAllowed ?? 0, DefensesTotal = deffensePars.MaxAllowed ?? 0, DefensesUsed = defends
+               };
     }
 
     public async Task MakeLeader(int campaignId, int teamId, int userId)

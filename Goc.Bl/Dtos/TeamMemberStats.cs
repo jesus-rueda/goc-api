@@ -13,5 +13,8 @@ namespace Goc.Business.Dtos
         public int  DefensesUsed { get; set; }
         public int DefensesTotal { get; set; }
 
+        public int DuelsUsed { get; set; }
+
+        public int? DuelsTotal { get; set; }
     }
 }

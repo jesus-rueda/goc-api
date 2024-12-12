@@ -336,6 +336,17 @@ internal class ActionsService : IActionsService
     public async Task<DuelAction> Duel(int campaignId, ICampaignProfile user, int teamId, int duelGameId, int betCoinks)
     {
         var parms = await this.myCampaignService.GetParametersFor(campaignId, ActionType.DuelChallenge);
+
+
+        var duels =await  this.myContext.ActionsLog.Include(x => x.TeamCharacter)
+            .Where(x => x.TeamCharacter.CampaignId == campaignId && x.TeamCharacterId == user.MembershipId)
+            .CountAsync();
+
+        if (duels >= parms.MaxAllowed)
+        {
+            return new DuelAction() { Effective = false, Message = "Max duels allowed for user" };
+        }
+        
         var logId = await this.myEvidenceService.RegisterAsync(campaignId, ActionType.DuelChallenge, user.MembershipId!.Value, 0, parms.Duration);
 
         var defenderTeam = await this.myTeamService.GetAsync(campaignId, teamId);
