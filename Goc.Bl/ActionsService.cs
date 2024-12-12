@@ -348,14 +348,10 @@ internal class ActionsService : IActionsService
         betCoinks = Math.Min(betCoinks, defenderTeam.Coinks);
 
 
-        if(betCoinks < parms.Coinks)
+   
+        if (betCoinks > parms.Coinks)
         {
-            return new DuelAction() { Effective = false, Message = $"Min bet can be {parms.Coinks}" };
-        }
-
-        if (betCoinks > parms.MaxAllowed)
-        {
-            return new DuelAction() { Effective = false, Message = $"Max bet can be {parms.MaxAllowed}" };
+            return new DuelAction() { Effective = false, Message = $"Max bet can be {parms.Coinks}" };
         }
 
         var room = new DuelRoom()

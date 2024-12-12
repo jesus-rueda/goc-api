@@ -46,6 +46,7 @@ public class CampaignService : ICampaignService
                                                                                             new CampaignActionParameters()
                                                                                             {
                                                                                                 ActionType = ActionType.DuelChallenge,
+                                                                                                Coinks = 2000,
                                                                                                 MaxAllowed = 5,
                                                                                                 Duration = TimeSpan.FromDays(2)
                                                                                             }
