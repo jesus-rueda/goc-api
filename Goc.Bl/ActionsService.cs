@@ -183,6 +183,11 @@ internal class ActionsService : IActionsService
             return new DuelAction() { Effective = false, Message = "Room not found" };
         }
 
+        if(room.Result != null)
+        {
+            return new DuelAction() { Effective = false, Message = "Game already completed" };
+        }
+
         room.GameState = gameState;
         room.CurrentTurn = null;
 
