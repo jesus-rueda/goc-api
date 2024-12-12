@@ -81,8 +81,10 @@ namespace Goc.Business.Hubs
         {
             var profile = await myUserService.GetProfileByMemberId(membershipId);
             var duelAction = await myActionsService.EndDuelTurn(roomName, choice, profile);
-
-            await Clients.Group(roomName.ToString()).SendAsync("NextTurnMessage", new { CurrentTurnMembershipId = duelAction.CurrentTurnMembershipId, duelAction.GameState });
+            if (duelAction.Effective)
+            {
+                await Clients.Group(roomName.ToString()).SendAsync("NextTurnMessage", new { CurrentTurnMembershipId = duelAction.CurrentTurnMembershipId, duelAction.GameState });
+            }
         }
 
         public async Task FinishDuel(int roomName, int memberId, PlayerGameResult result)
@@ -91,8 +93,10 @@ namespace Goc.Business.Hubs
             {
                 var profile = await myUserService.GetProfileByMemberId(memberId);
                 var game = await myActionsService.FinishGame(roomName, null, result, profile);
-
-                await Clients.Group(roomName.ToString()).SendAsync("GameFinished", memberId, game.WinnerMemberId );
+                if (game.Effective)
+                {
+                    await Clients.Group(roomName.ToString()).SendAsync("GameFinished", memberId, game.WinnerMemberId);
+                }
             }
             catch (Exception ex)
             {
