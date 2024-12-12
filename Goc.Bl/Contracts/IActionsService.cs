@@ -19,5 +19,11 @@ namespace Goc.Business.Contracts
         Task<DuelAction> Duel(int campaignId, ICampaignProfile user, int teamId, int duelGameId, int betCoinks);
 
         Task<GocActionResult> FinishMission(int campaignId, int missionId, ICampaignProfile user, byte[] fileBytes);
+
+        Task<GocActionResult> FinishGame(int roomId, string gameState, GameResult result, ICampaignProfile user);
+
+        Task<DuelAction> GetDuelTurnData(int roomId, ICampaignProfile user);
+
+        Task<DuelAction> EndDuelTurn(int roomId, string gameState, ICampaignProfile user);
     }
 }

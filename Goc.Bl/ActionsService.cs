@@ -214,7 +214,7 @@ internal class ActionsService : IActionsService
         return new GocActionResult() { Coinks = room.Bet, Effective = true, Message = "Game completed" };
     }
 
-    public async Task<DuelAction> GetTurnData(int roomId, ICampaignProfile user)
+    public async Task<DuelAction> GetDuelTurnData(int roomId, ICampaignProfile user)
     {   
         var  room =  await this.myContext.DuelRooms
             .Include(x=>x.ActionLog)
@@ -244,7 +244,7 @@ internal class ActionsService : IActionsService
             return duel;
     }
 
-    public async Task<DuelAction> EndTurn(int roomId, string gameState, ICampaignProfile user)
+    public async Task<DuelAction> EndDuelTurn(int roomId, string gameState, ICampaignProfile user)
     {
         var room = await this.myContext.DuelRooms
             .Include(x => x.ActionLog)
