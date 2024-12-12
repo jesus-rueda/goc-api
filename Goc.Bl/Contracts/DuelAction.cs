@@ -33,4 +33,6 @@ public class DuelAction
     public bool IsMyTurn { get; set; }
 
     public int CurrentTurnMembershipId { get; set; }
+
+    public int? WinnerMemberId { get; set; }
 }

@@ -173,18 +173,17 @@ internal class ActionsService : IActionsService
 
 
 
-    public async Task<GocActionResult> FinishGame(int roomId, string gameState, PlayerGameResult result, ICampaignProfile user)
+    public async Task<DuelAction> FinishGame(int roomId, string gameState, PlayerGameResult result, ICampaignProfile user)
     {
         var campaignId = user.CampaignId!.Value;
         var parms = await this.myCampaignService.GetParametersFor(campaignId, ActionType.DuelChallenge);
         var room = await this.myContext.DuelRooms.FindAsync(roomId);
         if (room == null)
         {
-            return new GocActionResult() { Effective = false, Message = "Room not found" };
+            return new DuelAction() { Effective = false, Message = "Room not found" };
         }
 
         room.GameState = gameState;
-        room.Result = result.ToString();
         room.CurrentTurn = null;
 
         var challenger = await this.myContext.Memberships.FindAsync(room.ChallengerId);
@@ -201,11 +200,13 @@ internal class ActionsService : IActionsService
             case PlayerGameResult.Lose:
                 if(imChallenger)
                 {
+                    room.Result = GameResult.DefenderWin.ToString();
                     winner = defender;
                     loser = winner;
                 }
                 else
                 {
+                    room.Result = GameResult.ChallengerWin.ToString();
                     winner = challenger;
                     loser = defender;
                 }
@@ -214,17 +215,20 @@ internal class ActionsService : IActionsService
             case PlayerGameResult.Win:
                 if (!imChallenger)
                 {
+                    room.Result = GameResult.DefenderWin.ToString();
                     winner = defender;
                     loser = challenger;
                 }
                 else
                 {
+                    room.Result = GameResult.ChallengerWin.ToString();
                     winner = challenger;
                     loser = defender;
                 }
 
                 break;
             case PlayerGameResult.Draw:
+                room.Result = GameResult.Draw.ToString();
                 winner = null;
                 loser = null;
                 coinks = 0;
@@ -240,7 +244,13 @@ internal class ActionsService : IActionsService
                                                    affectedTeamId: loser?.TeamId);
 
         await this.myContext.SaveChangesAsync();
-        return new GocActionResult() { Coinks = room.Bet, Effective = true, Message = "Game completed" };
+        return new DuelAction()
+               {
+                   Coinks = room.Bet, 
+                   Effective = true, 
+                   WinnerMemberId = winner?.MembershipId,
+                   Message = "Game completed"
+               };
     }
 
     public async Task<DuelAction> GetDuelTurnData(int roomId, ICampaignProfile user)

@@ -141,6 +141,6 @@ app.UseAuthorization();
 
 app.MapControllers();
 app.MapHub<NotificationHub>("/Notification");
-app.MapHub<GameHub>("/Game");
+app.MapHub<GameHub>("/api/Game");
 
 app.Run();

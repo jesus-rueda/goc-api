@@ -25,9 +25,9 @@ namespace Goc.Models.Entities
 
         public int Rounds { get; set; }
 
-        public string GameState { get; set; }
+        public string? GameState { get; set; }
 
-        public string CurrentTurn { get; set; }
+        public string? CurrentTurn { get; set; }
 
         public string Result { get; set; }
 
