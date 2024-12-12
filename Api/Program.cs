@@ -78,7 +78,7 @@ options =>
     options.SlidingExpiration = true;
 });
 
-builder.Services.AddSingleton<DuelService>();
+//builder.Services.AddSingleton<DuelService>();
 
 var app = builder.Build();
 

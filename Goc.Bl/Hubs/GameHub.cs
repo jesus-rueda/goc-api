@@ -6,48 +6,65 @@ using System.Threading.Tasks;
 
 namespace Goc.Business.Hubs
 {
+    using Goc.Business.Contracts;
+    using Goc.Models;
     using Microsoft.AspNetCore.SignalR;
 
-    public class Duel
-    {
-        public int MoneyAmount { get; set; }
+    //public class Duel
+    //{
+    //    public int MoneyAmount { get; set; }
 
-        public string RoomName { get; set; }
+    //    public string RoomName { get; set; }
 
-        public string PlayerUnoId { get; set; }
+    //    public string PlayerUnoId { get; set; }
 
-        public string PlayerTwoId { get; set; }
-    }
+    //    public string PlayerTwoId { get; set; }
+    //}
 
-    public class DuelService
-    {
-        public List<Duel> duelList = new List<Duel>();
-    }
+    //public class DuelService
+    //{
+    //    public List<Duel> duelList = new List<Duel>();
+    //}
     public class GameHub: Hub
     {
-        private DuelService myDualService;
+        private readonly IActionsService myActionsService;
+        private readonly IUserService myUserService;
 
-        public GameHub(DuelService myDualService)
+        //private DuelService myDualService;
+
+        public GameHub(IActionsService actionsService, IUserService userService)
         {
-            this.myDualService = myDualService;
+            this.myActionsService = actionsService;
+            this.myUserService = userService;
         }
-        public async Task JoinRoom(string roomName, string user)
+
+        public async Task JoinRoom(int roomName, string user)
         {
-            await Groups.AddToGroupAsync(Context.ConnectionId, roomName);
+            await Groups.AddToGroupAsync(Context.ConnectionId, roomName.ToString());
+            var profile = await myUserService.GetProfileByUpn(user);
 
-            var duel = this.myDualService.duelList.Find(d => d.RoomName == roomName);
-            if (duel != null)
-            {
-                duel.PlayerTwoId = user;
-            }
-            else
-            {
+            
+            var duelAction = await myActionsService.GetDuelTurnData(roomName, profile);
 
-                duel = new Duel() { MoneyAmount = 10, PlayerUnoId = user, RoomName = roomName };
-                this.myDualService.duelList.Add(duel);
+            if(duelAction.IsMyTurn)
+            {
+                await Clients.Group(roomName.ToString()).SendAsync("SystemMessage", duelAction);
+                await Clients.Group(roomName.ToString()).SendAsync("NextTurnMessage", "$characterTurn", duelAction.GameState);
             }
 
-            await Clients.Group(roomName).SendAsync("SystemMessage", duel);
+            //var duel = this.myDualService.duelList.Find(d => d.RoomName == roomName);
+            //if (duel != null)
+            //{
+            //    duel.PlayerTwoId = user;
+            //}
+            //else
+            //{
+
+            //    duel = new Duel() { MoneyAmount = 10, PlayerUnoId = user, RoomName = roomName };
+            //    this.myDualService.duelList.Add(duel);
+            //}
+
+            //await Clients.Group(roomName.ToString()).SendAsync("SystemMessage", duel);
         }
 
         public async Task LeaveRoom(string roomName)
@@ -56,14 +73,17 @@ namespace Goc.Business.Hubs
             await Clients.Group(roomName).SendAsync("SystemMessage", $"{Context.ConnectionId} left room {roomName}");
         }
 
-        public async Task SendChoice(string roomName, string user, string choice)
+        public async Task SendChoice(int roomName, string user, string choice)
         {
-            await Clients.Group(roomName).SendAsync("ReceiveChoice", user, choice);
+            var profile = await myUserService.GetProfileByUpn(user);
+            await myActionsService.EndDuelTurn(roomName, choice, profile);
+            await Clients.Group(roomName.ToString()).SendAsync("ReceiveChoice", user, choice);
         }
 
-        public async Task SendMessage(string roomName, string user, string message)
+        public async Task FinishDuel(int roomName, string user, DuelAction duel, GameResult gameResult)
         {
-            await Clients.Group(roomName).SendAsync("ReceiveMessage", user, message);
+            var profile = await myUserService.GetProfileByUpn(user);
+            await myActionsService.FinishGame(roomName, duel.GameState, gameResult, profile);
         }
     }
 }
