@@ -53,7 +53,7 @@ namespace Goc.Business.Hubs
                                                                                          Upn = profile.Upn,
                                                                                       });
 
-            await this.Clients.Group(roomName.ToString()).SendAsync("NextTurnMessage", new { duelAction.CurrentTurnMemberId, duelAction.GameState });
+            await this.Clients.Group(roomName.ToString()).SendAsync("NextTurnMessage", new { CurrentTurnMembershipId = duelAction.CurrentTurnMembershipId, duelAction.GameState });
             
 
             //var duel = this.myDualService.duelList.Find(d => d.RoomName == roomName);
@@ -77,11 +77,12 @@ namespace Goc.Business.Hubs
             await Clients.Group(roomName).SendAsync("SystemMessage", $"{Context.ConnectionId} left room {roomName}");
         }
 
-        public async Task SendChoice(int roomName, string user, string choice)
+        public async Task SendChoice(int roomName, int  membershipId, string choice)
         {
-            var profile = await myUserService.GetProfileByUpn(user);
-            await myActionsService.EndDuelTurn(roomName, choice, profile);
-            await Clients.Group(roomName.ToString()).SendAsync("ReceiveChoice", user, choice);
+            var profile = await myUserService.GetProfileByMemberId(membershipId);
+            var duelAction = await myActionsService.EndDuelTurn(roomName, choice, profile);
+
+            await Clients.Group(roomName.ToString()).SendAsync("NextTurnMessage", membershipId, new { CurrentTurnMembershipId = duelAction.CurrentTurnMembershipId, duelAction.GameState });
         }
 
         public async Task FinishDuel(int roomName, int memberId, PlayerGameResult result)

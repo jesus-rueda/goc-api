@@ -199,10 +199,30 @@ internal class ActionsService : IActionsService
         switch (result)
         {
             case PlayerGameResult.Lose:
+                if(imChallenger)
+                {
+                    winner = defender;
+                    loser = winner;
+                }
+                else
+                {
+                    winner = challenger;
+                    loser = defender;
+                }
 
                 break;
             case PlayerGameResult.Win:
-                //(winner, loser) = (loser, winner);
+                if (!imChallenger)
+                {
+                    winner = defender;
+                    loser = challenger;
+                }
+                else
+                {
+                    winner = challenger;
+                    loser = defender;
+                }
+
                 break;
             case PlayerGameResult.Draw:
                 winner = null;
@@ -217,7 +237,7 @@ internal class ActionsService : IActionsService
                                                    winner?.MembershipId ?? user.MembershipId!.Value,
                                                    coinks,
                                                    parms.Duration,
-                                                   affectedTeamId: loser?.MembershipId);
+                                                   affectedTeamId: loser?.TeamId);
 
         await this.myContext.SaveChangesAsync();
         return new GocActionResult() { Coinks = room.Bet, Effective = true, Message = "Game completed" };
@@ -231,10 +251,7 @@ internal class ActionsService : IActionsService
             .FirstOrDefaultAsync();
 
 
-        var challenger = await this.myContext.Memberships.FindAsync(room.ChallengerId);
-        var defender = await this.myContext.Memberships.FindAsync(room.DefenderId);
-
-        
+       
         if (room.ChallengerId != user.MembershipId && room.DefenderId != user.MembershipId)
         {
             return new DuelAction() { Effective = false, Message = "User not in the room" };
@@ -246,6 +263,10 @@ internal class ActionsService : IActionsService
                       || room.CurrentTurn == PlayerType.Defender.ToString() && room.DefenderId == user.MembershipId;
 
 
+
+        //var challenger = await this.myContext.Memberships.FindAsync(room.ChallengerId);
+        //var defender = await this.myContext.Memberships.FindAsync(room.DefenderId);
+
         var duel = new DuelAction()
                          {
                              Id = room.RoomId,
@@ -254,7 +275,9 @@ internal class ActionsService : IActionsService
                              GameId = room.GameId,
                              Deadline = room.ActionLog.DateTimeTo,
                              Effective = true,
-                         };
+                             //IsMyTurn = isMyTurn,
+                             CurrentTurnMembershipId = room.CurrentTurn == PlayerType.Challenger.ToString() ? room.ChallengerId : room.DefenderId
+        };
 
             return duel;
     }
@@ -291,10 +314,11 @@ internal class ActionsService : IActionsService
                        Coinks = room.Bet,
                        GameState = room.GameState,
                        GameId = room.GameId,
-                       IsMyTurn = false,
+                       //IsMyTurn = false,
                        Deadline = room.ActionLog.DateTimeTo,
                        Effective = true,
-                   };
+                       CurrentTurnMembershipId = room.CurrentTurn == PlayerType.Challenger.ToString() ? room.ChallengerId : room.DefenderId
+        };
 
         return duel;
     }
