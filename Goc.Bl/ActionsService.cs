@@ -9,6 +9,7 @@
 namespace Goc.Business;
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Goc.Api.Dtos;
@@ -435,6 +436,33 @@ internal class ActionsService : IActionsService
                                                    missionId: missionId,
                                                    evidence: fileBytes);
         return new GocActionResult() { Effective = true, Coinks = coinks, Message = "Mission completed" };
+    }
+
+    public async Task<List<DuelAction>> DuelsOpen(int campaignId, ICampaignProfile user)
+    {
+        var duelsRooms = await this.myContext.DuelRooms
+            .Include(x => x.ActionLog)
+            .ThenInclude(al => al.TeamCharacter)
+            .ThenInclude(tc => tc.Team)
+            .Where(x => x.DefenderId == user.MembershipId && x.Result == null)
+            .ToListAsync();
+
+        var duels = new List<DuelAction>();
+        foreach (var duelroom in duelsRooms)
+        {
+            duels.Add(new DuelAction
+            {
+                Id = duelroom.RoomId,
+                Oponent = new TeamCharacterProfileDto
+                {
+                    TeamId = duelroom.ActionLog.TeamCharacter.TeamId.Value,
+                    TeamName = duelroom.ActionLog.TeamCharacter.Team.Name
+                }
+            });
+        }
+
+        return duels;
+
     }
 
     #endregion

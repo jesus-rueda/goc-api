@@ -99,6 +99,16 @@ public class ActionsController : ControllerBase
         return this.Ok(response);
     }
 
+
+    [HttpGet]
+    [Route("Campaigns/{campaignId}/[controller]/duels")]
+    public async Task<ActionResult<DuelAction>> DuelsOpen([FromRoute] int campaignId)
+    {
+        var user = this.User.GetGocUser();
+        var response = await this.myActionsService.DuelsOpen(campaignId, user);
+        return this.Ok(response);
+    }
+
     #endregion
 
     //[HttpPost]

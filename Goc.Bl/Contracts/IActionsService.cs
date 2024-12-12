@@ -25,5 +25,7 @@ namespace Goc.Business.Contracts
         Task<DuelAction> GetDuelTurnData(int roomId, ICampaignProfile user);
 
         Task<DuelAction> EndDuelTurn(int roomId, string gameState, ICampaignProfile user);
+
+        Task<List<DuelAction>> DuelsOpen(int campaignId, ICampaignProfile user);
     }
 }
