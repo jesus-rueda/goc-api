@@ -339,7 +339,7 @@ internal class ActionsService : IActionsService
 
 
         var duels =await  this.myContext.ActionsLog.Include(x => x.TeamCharacter)
-            .Where(x => x.TeamCharacter.CampaignId == campaignId && x.TeamCharacterId == user.MembershipId)
+            .Where(x => x.TeamCharacter.CampaignId == campaignId && x.TeamCharacterId == user.MembershipId && x.ActionTypeId == (int)ActionType.DuelChallenge)
             .CountAsync();
 
         if (duels >= parms.MaxAllowed)
