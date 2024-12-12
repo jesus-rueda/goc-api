@@ -309,6 +309,12 @@ internal class ActionsService : IActionsService
             return new DuelAction() { Effective = false, Message = "User not in the room" };
         }
 
+        if(room.Result != null)
+        {
+            return new DuelAction() { Effective = false, Message = "Game already completed" };
+        }
+
+
         var isMyTurn = room.CurrentTurn == PlayerType.Challenger.ToString() && room.ChallengerId == user.MembershipId
                        || room.CurrentTurn == PlayerType.Defender.ToString() && room.DefenderId == user.MembershipId;
 
